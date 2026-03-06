@@ -104,7 +104,7 @@ class AuthController extends Controller
             }
 
             // Store new image
-            $path = $request->file('image')->store('users', 'public');
+            $path = $request->file('image')->store("users/{$user->id}", 'public');
             $user->image = $path;
         }
 
