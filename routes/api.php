@@ -35,8 +35,9 @@ Route::prefix('admin')->group(function () {
     // Protected routes (require authentication)
     Route::middleware('auth:sanctum')->group(function () {
         // Auth routes
-        Route::get('/auth/user', [AuthController::class, 'user']);
+        Route::post('/auth/user', [AuthController::class, 'user']);
         Route::post('/auth/logout', [AuthController::class, 'logout']);
+        Route::post('/auth/update-profile', [AuthController::class, 'updateProfile']);
 
         // Users routes
         Route::apiResource('users', UserController::class);

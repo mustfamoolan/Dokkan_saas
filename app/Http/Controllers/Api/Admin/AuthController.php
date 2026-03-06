@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -78,6 +79,40 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'تم تسجيل الخروج بنجاح',
+        ]);
+    }
+    /**
+     * Update user profile
+     */
+    public function updateProfile(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        $request->validate([
+            'name' => ['sometimes', 'required', 'string', 'max:255'],
+            'image' => ['sometimes', 'nullable', 'image', 'max:2048'], // 2MB Max
+        ]);
+
+        if ($request->has('name')) {
+            $user->name = $request->input('name');
+        }
+
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($user->image) {
+                Storage::disk('public')->delete($user->image);
+            }
+
+            // Store new image
+            $path = $request->file('image')->store('users', 'public');
+            $user->image = $path;
+        }
+
+        $user->save();
+
+        return response()->json([
+            'message' => 'تم تحديث الملف الشخصي بنجاح',
+            'user' => new UserResource($user->load(['roles', 'permissions'])),
         ]);
     }
 }
