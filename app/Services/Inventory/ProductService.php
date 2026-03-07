@@ -28,6 +28,8 @@ class ProductService
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('sku', 'like', "%{$search}%")
+                    ->orWhere('author', 'like', "%{$search}%")
+                    ->orWhere('publisher', 'like', "%{$search}%")
                     ->orWhere('short_description', 'like', "%{$search}%");
             });
         }
@@ -70,7 +72,34 @@ class ProductService
             $query->whereRaw('quantity <= min_quantity');
         }
 
+        if (isset($filters['stock_status'])) {
+            switch ($filters['stock_status']) {
+                case 'in_stock':
+                    $query->where('quantity', '>', 0);
+                    break;
+                case 'low_stock':
+                    $query->whereRaw('quantity <= min_quantity')->where('quantity', '>', 0);
+                    break;
+                case 'out_of_stock':
+                    $query->where('quantity', '<=', 0);
+                    break;
+            }
+        }
+
         return $query->latest()->paginate($filters['per_page'] ?? 15);
+    }
+
+    /**
+     * Get inventory statistics
+     */
+    public function getInventoryStats(): array
+    {
+        return [
+            'total' => Product::count(),
+            'in_stock' => Product::where('quantity', '>', 0)->count(),
+            'low_stock' => Product::whereRaw('quantity <= min_quantity')->where('quantity', '>', 0)->count(),
+            'out_of_stock' => Product::where('quantity', '<=', 0)->count(),
+        ];
     }
 
     /**
@@ -157,7 +186,7 @@ class ProductService
             // Upload new images if provided
             if ($images !== null && !empty($images)) {
                 // Add new images to existing ones (don't replace)
-                    $this->uploadImages($product, $images);
+                $this->uploadImages($product, $images);
             }
 
             // Sync tags if provided
@@ -290,7 +319,7 @@ class ProductService
     public function uploadImages(Product $product, array $images): void
     {
         $uploadPath = "products/{$product->id}";
-        
+
         // Get the highest image_order from existing images
         $maxOrder = $product->images()->max('image_order') ?? 0;
 

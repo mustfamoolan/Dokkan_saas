@@ -35,6 +35,7 @@ class ProductController extends Controller
             'product_type',
             'is_active',
             'low_stock',
+            'stock_status',
             'per_page'
         ]);
 
@@ -44,9 +45,12 @@ class ProductController extends Controller
         }
 
         $products = $this->productService->getAllProducts($filters);
+        $stats = $this->productService->getInventoryStats();
 
         // Returning the collection directly handles pagination and 'data' wrapping correctly for the Flutter app
-        return ProductResource::collection($products)->response()->setStatusCode(200);
+        return ProductResource::collection($products)->additional([
+            'stats' => $stats
+        ])->response()->setStatusCode(200);
     }
 
     /**
