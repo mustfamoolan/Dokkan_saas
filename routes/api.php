@@ -62,6 +62,15 @@ Route::prefix('admin')->group(function () {
 
         // Settings routes
         Route::prefix('settings')->group(function () {
+            // General Settings
+            Route::get('/general', [\App\Http\Controllers\Api\Admin\GeneralSettingsApiController::class, 'index']);
+            Route::put('/general', [\App\Http\Controllers\Api\Admin\GeneralSettingsApiController::class, 'update']);
+
+            // Gifts Management (General)
+            Route::post('/general/gifts', [\App\Http\Controllers\Api\Admin\GeneralSettingsApiController::class, 'storeGift']);
+            Route::put('/general/gifts/{id}', [\App\Http\Controllers\Api\Admin\GeneralSettingsApiController::class, 'updateGift']);
+            Route::delete('/general/gifts/{id}', [\App\Http\Controllers\Api\Admin\GeneralSettingsApiController::class, 'destroyGift']);
+
             // Order Commission
             Route::prefix('order-commission')->group(function () {
                 Route::get('/', [\App\Http\Controllers\Api\Admin\OrderCommissionSettingsController::class, 'index']);
