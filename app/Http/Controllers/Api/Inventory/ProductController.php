@@ -37,17 +37,16 @@ class ProductController extends Controller
             'low_stock',
             'per_page'
         ]);
+
+        // Cast per_page to integer to avoid issues with empty strings or nulls
+        if (isset($filters['per_page'])) {
+            $filters['per_page'] = (int) $filters['per_page'];
+        }
+
         $products = $this->productService->getAllProducts($filters);
 
-        return response()->json([
-            'data' => ProductResource::collection($products->items()),
-            'meta' => [
-                'current_page' => $products->currentPage(),
-                'last_page' => $products->lastPage(),
-                'per_page' => $products->perPage(),
-                'total' => $products->total(),
-            ],
-        ]);
+        // Returning the collection directly handles pagination and 'data' wrapping correctly for the Flutter app
+        return ProductResource::collection($products)->response()->setStatusCode(200);
     }
 
     /**
@@ -118,17 +117,10 @@ class ProductController extends Controller
      */
     public function getLowStock(Request $request): JsonResponse
     {
-        $filters = array_merge($request->only(['per_page']), ['low_stock' => true]);
+        $perPage = $request->has('per_page') ? (int) $request->per_page : 15;
+        $filters = ['low_stock' => true, 'per_page' => $perPage];
         $products = $this->productService->getAllProducts($filters);
 
-        return response()->json([
-            'data' => ProductResource::collection($products->items()),
-            'meta' => [
-                'current_page' => $products->currentPage(),
-                'last_page' => $products->lastPage(),
-                'per_page' => $products->perPage(),
-                'total' => $products->total(),
-            ],
-        ]);
+        return ProductResource::collection($products)->response()->setStatusCode(200);
     }
 }
