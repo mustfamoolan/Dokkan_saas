@@ -50,6 +50,14 @@ class Category extends Model
     }
 
     /**
+     * Get the products in this subcategory.
+     */
+    public function subcategoryProducts(): HasMany
+    {
+        return $this->hasMany(Product::class, 'subcategory_id');
+    }
+
+    /**
      * Get the full path of the category.
      */
     public function getFullPath(): string

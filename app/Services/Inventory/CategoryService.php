@@ -11,7 +11,7 @@ class CategoryService
      */
     public function getAllCategories(array $filters = []): \Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
-        $query = Category::with('parent', 'children')->withCount('products');
+        $query = Category::with('parent', 'children')->withCount(['products', 'subcategoryProducts']);
 
         if (isset($filters['search'])) {
             $search = $filters['search'];
@@ -41,10 +41,10 @@ class CategoryService
         return Category::whereNull('parent_id')
             ->with([
                 'children' => function ($query) {
-                    $query->orderBy('name')->withCount('products');
+                    $query->orderBy('name')->withCount(['products', 'subcategoryProducts']);
                 }
             ])
-            ->withCount('products')
+            ->withCount(['products', 'subcategoryProducts'])
             ->orderBy('name')
             ->get();
     }

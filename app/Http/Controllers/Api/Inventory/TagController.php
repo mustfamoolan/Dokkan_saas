@@ -15,8 +15,6 @@ class TagController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $this->authorize('tags.view');
-
         $query = Tag::query();
 
         if ($request->has('search')) {
@@ -43,8 +41,6 @@ class TagController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        $this->authorize('tags.create');
-
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255', 'unique:tags,name'],
         ]);
@@ -62,8 +58,6 @@ class TagController extends Controller
      */
     public function show(Tag $tag): JsonResponse
     {
-        $this->authorize('tags.view');
-
         $tag->loadCount('products');
 
         return response()->json([
@@ -76,8 +70,6 @@ class TagController extends Controller
      */
     public function update(Request $request, Tag $tag): JsonResponse
     {
-        $this->authorize('tags.update');
-
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255', 'unique:tags,name,' . $tag->id],
         ]);
@@ -95,8 +87,6 @@ class TagController extends Controller
      */
     public function destroy(Tag $tag): JsonResponse
     {
-        $this->authorize('tags.delete');
-
         $tag->delete();
 
         return response()->json([
