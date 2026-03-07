@@ -32,7 +32,11 @@ class SettingsController extends Controller
         $gifts = GiftSetting::gifts()->active()->orderBy('name')->get();
         $giftBoxes = GiftSetting::giftBoxes()->active()->orderBy('min_books')->get();
 
-        return view('general.settings', compact('generalSetting', 'exceptions', 'gifts', 'giftBoxes'));
+        // Order Commission & Reward Points
+        $orderCommissionSetting = \App\Models\OrderCommissionSetting::first();
+        $rewardPointsSetting = \App\Models\GiftPointsSetting::first();
+
+        return view('general.settings', compact('generalSetting', 'exceptions', 'gifts', 'giftBoxes', 'orderCommissionSetting', 'rewardPointsSetting'));
     }
 
     /**
@@ -177,5 +181,55 @@ class SettingsController extends Controller
 
         return redirect()->route('general.settings.index')
             ->with('success', 'تم حذف إعداد الهدية بنجاح.');
+    }
+
+    /**
+     * Update order commission general setting.
+     */
+    public function updateOrderCommissionGeneral(Request $request): RedirectResponse
+    {
+        $this->authorize('settings.update');
+
+        $validated = $request->validate([
+            'commission_value' => ['required', 'numeric', 'min:0'],
+            'is_active' => ['nullable', 'boolean'],
+        ]);
+
+        $setting = \App\Models\OrderCommissionSetting::first();
+        $validated['is_active'] = $request->has('is_active');
+
+        if ($setting) {
+            $setting->update($validated);
+        } else {
+            \App\Models\OrderCommissionSetting::create($validated);
+        }
+
+        return redirect()->route('general.settings.index')
+            ->with('success', 'تم تحديث إعداد عمولة التجهيز بنجاح.');
+    }
+
+    /**
+     * Update reward points general setting.
+     */
+    public function updateRewardPointsGeneral(Request $request): RedirectResponse
+    {
+        $this->authorize('settings.update');
+
+        $validated = $request->validate([
+            'points_per_order' => ['required', 'integer', 'min:0'],
+            'is_active' => ['nullable', 'boolean'],
+        ]);
+
+        $setting = \App\Models\GiftPointsSetting::first();
+        $validated['is_active'] = $request->has('is_active');
+
+        if ($setting) {
+            $setting->update($validated);
+        } else {
+            \App\Models\GiftPointsSetting::create($validated);
+        }
+
+        return redirect()->route('general.settings.index')
+            ->with('success', 'تم تحديث إعداد نقاط المكافآت بنجاح.');
     }
 }

@@ -144,6 +144,92 @@
     </div>
 </div>
 
+<!-- Order Commission Settings -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title d-flex align-items-center gap-2">
+                    <iconify-icon icon="solar:bill-list-bold-duotone" class="text-primary fs-20"></iconify-icon>
+                    إعدادات عمولة التجهيز
+                </h4>
+            </div>
+            <div class="card-body">
+                <form action="{{ route('general.settings.order-commission.update-general') }}" method="POST">
+                    @csrf
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">قيمة العمولة العامة (دينار عراقي) <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" name="commission_value" 
+                                       value="{{ $orderCommissionSetting->commission_value ?? 0 }}" 
+                                       step="0.01" min="0" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3 mt-4 pt-2">
+                                <div class="form-check form-switch form-switch-lg">
+                                    <input class="form-check-input" type="checkbox" role="switch" name="is_active" value="1" id="commission_active"
+                                    {{ ($orderCommissionSetting && $orderCommissionSetting->is_active) ? 'checked' : '' }}>
+                                    <label class="form-check-label ps-2 mt-1" for="commission_active">تفعيل عمولة التجهيز بشكل عام</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 text-end">
+                            <button type="submit" class="btn btn-primary">حفظ الإعدادات العامة</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reward Points Settings -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title d-flex align-items-center gap-2">
+                    <iconify-icon icon="solar:star-fall-bold-duotone" class="text-primary fs-20"></iconify-icon>
+                    إعدادات نقاط المكافآت
+                </h4>
+            </div>
+            <div class="card-body">
+                <form action="{{ route('general.settings.reward-points.update-general') }}" method="POST">
+                    @csrf
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">نقاط المكافآت الافتراضية لكل طلب <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" name="points_per_order" 
+                                       value="{{ $rewardPointsSetting->points_per_order ?? 0 }}" 
+                                       step="1" min="0" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3 mt-4 pt-2">
+                                <div class="form-check form-switch form-switch-lg">
+                                    <input class="form-check-input" type="checkbox" role="switch" name="is_active" value="1" id="reward_points_active"
+                                    {{ ($rewardPointsSetting && $rewardPointsSetting->is_active) ? 'checked' : '' }}>
+                                    <label class="form-check-label ps-2 mt-1" for="reward_points_active">تفعيل نظام نقاط المكافآت</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 text-end">
+                            <button type="submit" class="btn btn-primary">حفظ الإعدادات العامة</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Gift Settings -->
 <div class="row mb-4">
     <div class="col-12">

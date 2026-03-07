@@ -134,6 +134,8 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
         Route::post('/withdrawal/exceptions', [\App\Http\Controllers\General\SettingsController::class, 'createWithdrawalException'])->name('withdrawal.create-exception');
         Route::put('/withdrawal/exceptions/{withdrawalSetting}', [\App\Http\Controllers\General\SettingsController::class, 'updateWithdrawalException'])->name('withdrawal.update-exception');
         Route::delete('/withdrawal/exceptions/{withdrawalSetting}', [\App\Http\Controllers\General\SettingsController::class, 'deleteWithdrawalException'])->name('withdrawal.delete-exception');
+        Route::post('/order-commission', [\App\Http\Controllers\General\SettingsController::class, 'updateOrderCommissionGeneral'])->name('order-commission.update-general');
+        Route::post('/reward-points', [\App\Http\Controllers\General\SettingsController::class, 'updateRewardPointsGeneral'])->name('reward-points.update-general');
         Route::post('/gifts', [\App\Http\Controllers\General\SettingsController::class, 'storeGiftSetting'])->name('gifts.store');
         Route::put('/gifts/{giftSetting}', [\App\Http\Controllers\General\SettingsController::class, 'updateGiftSetting'])->name('gifts.update');
         Route::delete('/gifts/{giftSetting}', [\App\Http\Controllers\General\SettingsController::class, 'deleteGiftSetting'])->name('gifts.delete');
@@ -165,7 +167,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
         Route::post('/', [OrderCommissionSettingsController::class, 'store'])->name('store');
         Route::put('/{id}', [OrderCommissionSettingsController::class, 'update'])->name('update');
         Route::delete('/{id}', [OrderCommissionSettingsController::class, 'destroy'])->name('destroy');
-        
+
         // Exceptions
         Route::post('/exceptions', [OrderCommissionSettingsController::class, 'storeException'])->name('exceptions.store');
         Route::put('/exceptions/{id}', [OrderCommissionSettingsController::class, 'updateException'])->name('exceptions.update');

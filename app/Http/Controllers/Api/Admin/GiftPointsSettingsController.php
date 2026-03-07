@@ -55,7 +55,7 @@ class GiftPointsSettingsController extends Controller
             }
 
             return response()->json([
-                'message' => 'تم تحديث إعدادات نقاط الهدايا بنجاح.',
+                'message' => 'تم تحديث إعدادات نقاط المكافآت بنجاح.',
                 'settings' => $this->pointsService->getSettings()->first()
             ]);
         } catch (\Exception $e) {
