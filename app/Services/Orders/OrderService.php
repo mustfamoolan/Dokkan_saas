@@ -19,7 +19,8 @@ class OrderService
 {
     public function __construct(
         protected OrderCommissionService $commissionService,
-        protected RepresentativeAccountService $accountService
+        protected RepresentativeAccountService $accountService,
+        protected GiftPointsService $giftPointsService
     ) {
     }
 
@@ -43,11 +44,11 @@ class OrderService
         // البصرة: 3000 دينار
         // باقي المحافظات: 5000 دينار
         $basraId = \App\Models\Governorate::where('name', 'البصرة')->value('id');
-        
+
         if ($basraId && $governorateId == $basraId) {
             return 3000.0;
         }
-        
+
         return 5000.0;
     }
 
@@ -83,7 +84,7 @@ class OrderService
         return DB::transaction(function () use ($customerData, $representative, $user) {
             $governorateId = $customerData['governorate_id'] ?? null;
             $deliveryFee = $this->calculateDeliveryFee($governorateId);
-            
+
             $giftId = $customerData['gift_id'] ?? null;
             $giftBoxId = $customerData['gift_box_id'] ?? null;
             $giftPrice = $this->calculateGiftPrice($giftId, $giftBoxId);
@@ -101,7 +102,7 @@ class OrderService
                 'gift_id' => $giftId,
                 'gift_box_id' => $giftBoxId,
                 'gift_price' => $giftPrice,
-                'status' => OrderStatus::NEW,
+                'status' => OrderStatus::NEW ,
                 'representative_id' => $representative?->id,
                 'created_by' => $user?->id,
             ]);
@@ -255,6 +256,9 @@ class OrderService
                     'balance_after' => $balanceAfter,
                 ]);
             }
+
+            // Award Gift Points
+            $this->giftPointsService->awardPoints($order);
 
             // Update order status
             $order->update([

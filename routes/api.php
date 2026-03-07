@@ -60,6 +60,27 @@ Route::prefix('admin')->group(function () {
         Route::post('employee-types/{employee_type}/assign-role', [EmployeeTypeController::class, 'assignRole']);
         Route::post('employee-types/{employee_type}/revoke-role', [EmployeeTypeController::class, 'revokeRole']);
 
+        // Settings routes
+        Route::prefix('settings')->group(function () {
+            // Order Commission
+            Route::prefix('order-commission')->group(function () {
+                Route::get('/', [\App\Http\Controllers\Api\Admin\OrderCommissionSettingsController::class, 'index']);
+                Route::post('/', [\App\Http\Controllers\Api\Admin\OrderCommissionSettingsController::class, 'storeOrUpdate']);
+                Route::post('/exceptions', [\App\Http\Controllers\Api\Admin\OrderCommissionSettingsController::class, 'storeException']);
+                Route::put('/exceptions/{id}', [\App\Http\Controllers\Api\Admin\OrderCommissionSettingsController::class, 'updateException']);
+                Route::delete('/exceptions/{id}', [\App\Http\Controllers\Api\Admin\OrderCommissionSettingsController::class, 'destroyException']);
+            });
+
+            // Gift Points
+            Route::prefix('gift-points')->group(function () {
+                Route::get('/', [\App\Http\Controllers\Api\Admin\GiftPointsSettingsController::class, 'index']);
+                Route::post('/', [\App\Http\Controllers\Api\Admin\GiftPointsSettingsController::class, 'storeOrUpdate']);
+                Route::post('/exceptions', [\App\Http\Controllers\Api\Admin\GiftPointsSettingsController::class, 'storeException']);
+                Route::put('/exceptions/{id}', [\App\Http\Controllers\Api\Admin\GiftPointsSettingsController::class, 'updateException']);
+                Route::delete('/exceptions/{id}', [\App\Http\Controllers\Api\Admin\GiftPointsSettingsController::class, 'destroyException']);
+            });
+        });
+
         // Inventory routes
         Route::prefix('inventory')->group(function () {
             Route::get('products/{product}/recommendations', [ProductController::class, 'recommendations']);
