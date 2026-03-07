@@ -11,14 +11,18 @@ class CategoryService
      */
     public function getAllCategories(array $filters = []): \Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
-        $query = Category::with('parent', 'children');
+        $query = Category::with('parent', 'children')->withCount('products');
 
         if (isset($filters['search'])) {
             $search = $filters['search'];
             $query->where('name', 'like', "%{$search}%");
         }
 
-        if (isset($filters['parent_id'])) {
+        // root_only=1: return only top-level categories (parent_id IS NULL)
+        if (!empty($filters['root_only'])) {
+            $query->whereNull('parent_id');
+        } elseif (isset($filters['parent_id'])) {
+            // parent_id filter: return children of a specific category
             $query->where('parent_id', $filters['parent_id']);
         }
 
@@ -35,9 +39,12 @@ class CategoryService
     public function getCategoryTree(): \Illuminate\Database\Eloquent\Collection
     {
         return Category::whereNull('parent_id')
-            ->with(['children' => function ($query) {
-                $query->orderBy('name');
-            }])
+            ->with([
+                'children' => function ($query) {
+                    $query->orderBy('name')->withCount('products');
+                }
+            ])
+            ->withCount('products')
             ->orderBy('name')
             ->get();
     }

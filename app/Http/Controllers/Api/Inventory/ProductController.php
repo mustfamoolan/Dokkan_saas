@@ -127,4 +127,13 @@ class ProductController extends Controller
 
         return ProductResource::collection($products)->response()->setStatusCode(200);
     }
+    /**
+     * Get recommended products for the given product
+     */
+    public function recommendations(Product $product): JsonResponse
+    {
+        $recommendations = $this->productService->getRecommendedProducts($product);
+
+        return ProductResource::collection($recommendations)->response()->setStatusCode(200);
+    }
 }

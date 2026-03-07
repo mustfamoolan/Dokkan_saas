@@ -381,6 +381,48 @@ class ProductService
     }
 
     /**
+     * Get recommended products based on the given product
+     */
+    public function getRecommendedProducts(Product $product, int $limit = 10): \Illuminate\Database\Eloquent\Collection
+    {
+        $query = Product::with(['category', 'subcategory', 'images', 'tags'])
+            ->where('id', '!=', $product->id)
+            ->where('is_active', true);
+
+        $tagIds = $product->tags->pluck('id')->toArray();
+
+        $query->where(function ($q) use ($product, $tagIds) {
+            // Match subcategory
+            if ($product->subcategory_id) {
+                $q->orWhere('subcategory_id', $product->subcategory_id);
+            }
+
+            // Match parent category if no subcategory or to broaden results
+            $q->orWhere('category_id', $product->category_id);
+
+            // Match same publisher
+            if ($product->publisher) {
+                $q->orWhere('publisher', $product->publisher);
+            }
+
+            // Match same author
+            if ($product->author) {
+                $q->orWhere('author', $product->author);
+            }
+
+            // Match tags
+            if (!empty($tagIds)) {
+                $q->orWhereHas('tags', function ($tagQuery) use ($tagIds) {
+                    $tagQuery->whereIn('tags.id', $tagIds);
+                });
+            }
+        });
+
+        // Order by relevance (this is a simple approach, can be improved)
+        return $query->inRandomOrder()->limit($limit)->get();
+    }
+
+    /**
      * Generate unique SKU
      */
     private function generateSku(): string

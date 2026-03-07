@@ -29,7 +29,7 @@ class CategoryResource extends JsonResource
             'children' => $this->whenLoaded('children', function () {
                 return CategoryResource::collection($this->children);
             }),
-            'products_count' => $this->whenCounted('products', $this->products_count),
+            'products_count' => $this->products_count ?? 0,
             'created_at' => $this->created_at?->toDateTimeString(),
             'updated_at' => $this->updated_at?->toDateTimeString(),
         ];
