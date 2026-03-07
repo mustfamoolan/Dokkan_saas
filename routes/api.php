@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\Admin\UserController;
 use App\Http\Controllers\Api\Inventory\CategoryController;
 use App\Http\Controllers\Api\Inventory\ProductController;
 use App\Http\Controllers\Api\Inventory\SupplierController;
+use App\Http\Controllers\Api\Inventory\TagController;
 use App\Http\Controllers\Api\Representatives\RepresentativeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -67,6 +68,7 @@ Route::prefix('admin')->group(function () {
 
             Route::apiResource('categories', CategoryController::class);
             Route::apiResource('suppliers', SupplierController::class);
+            Route::apiResource('tags', TagController::class);
         });
 
         // FCM routes
