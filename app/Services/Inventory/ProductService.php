@@ -400,16 +400,17 @@ class ProductService
 
         $results = [];
 
-        // 1. Same Author
+        // 1. Same Author (Robust match)
         if ($product->author) {
+            $author = trim($product->author);
             $results['same_author'] = (clone $baseQuery)
-                ->where('author', $product->author)
+                ->where('author', 'LIKE', $author)
                 ->inRandomOrder()
                 ->limit($limit)
                 ->get();
         }
 
-        // 2. Same Subcategory
+        // 2. Same Subcategory (Precise branch)
         if ($product->subcategory_id) {
             $results['same_subcategory'] = (clone $baseQuery)
                 ->where('subcategory_id', $product->subcategory_id)
@@ -417,11 +418,31 @@ class ProductService
                 ->limit($limit)
                 ->get();
         }
+        // Fallback to Main Category if no subcategory results or no subcategory set
+        if (empty($results['same_subcategory'])) {
+            $results['same_category'] = (clone $baseQuery)
+                ->where('category_id', $product->category_id)
+                ->whereNull('subcategory_id') // Avoid duplicating subcategory results
+                ->inRandomOrder()
+                ->limit($limit)
+                ->get();
+
+            // If still empty, just get anything from the same category
+            if ($results['same_category']->isEmpty()) {
+                unset($results['same_category']);
+                $results['same_category'] = (clone $baseQuery)
+                    ->where('category_id', $product->category_id)
+                    ->inRandomOrder()
+                    ->limit($limit)
+                    ->get();
+            }
+        }
 
         // 3. Same Publisher
         if ($product->publisher) {
+            $publisher = trim($product->publisher);
             $results['same_publisher'] = (clone $baseQuery)
-                ->where('publisher', $product->publisher)
+                ->where('publisher', 'LIKE', $publisher)
                 ->inRandomOrder()
                 ->limit($limit)
                 ->get();
@@ -439,7 +460,9 @@ class ProductService
                 ->get();
         }
 
-        return $results;
+        return array_filter($results, function ($collection) {
+            return $collection->isNotEmpty();
+        });
     }
 
     /**
