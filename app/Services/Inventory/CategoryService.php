@@ -18,11 +18,12 @@ class CategoryService
             $query->where('name', 'like', "%{$search}%");
         }
 
-        // root_only=1: return only top-level categories (parent_id IS NULL)
-        if (!empty($filters['root_only'])) {
+        // Filtering by hierarchy
+        if (!empty($filters['only_root']) || !empty($filters['root_only'])) {
             $query->whereNull('parent_id');
+        } elseif (!empty($filters['only_sub'])) {
+            $query->whereNotNull('parent_id');
         } elseif (isset($filters['parent_id'])) {
-            // parent_id filter: return children of a specific category
             $query->where('parent_id', $filters['parent_id']);
         }
 

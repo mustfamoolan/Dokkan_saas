@@ -30,7 +30,7 @@ class CategoryController extends Controller
             ]);
         }
 
-        $filters = $request->only(['search', 'parent_id', 'is_active', 'per_page']);
+        $filters = $request->only(['search', 'parent_id', 'is_active', 'per_page', 'only_root', 'only_sub']);
         $categories = $this->categoryService->getAllCategories($filters);
 
         return response()->json([
