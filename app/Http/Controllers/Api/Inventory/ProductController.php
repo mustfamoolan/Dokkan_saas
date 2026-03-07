@@ -24,7 +24,19 @@ class ProductController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $filters = $request->only(['search', 'category_id', 'supplier_id', 'product_type', 'is_active', 'low_stock', 'per_page']);
+        $filters = $request->only([
+            'search',
+            'category_id',
+            'subcategory_id',
+            'supplier_id',
+            'tag_id',
+            'author',
+            'publisher',
+            'product_type',
+            'is_active',
+            'low_stock',
+            'per_page'
+        ]);
         $products = $this->productService->getAllProducts($filters);
 
         return response()->json([
