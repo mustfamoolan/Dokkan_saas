@@ -37,7 +37,11 @@ class ProductService
         if (isset($filters['category_id'])) {
             $categoryId = $filters['category_id'];
             $query->where(function ($q) use ($categoryId) {
+                // Return products where this ID is the main category,
+                // OR it's a subcategory of the product,
+                // OR the product's subcategory belongs to this parent category
                 $q->where('category_id', $categoryId)
+                    ->orWhere('subcategory_id', $categoryId)
                     ->orWhereIn('subcategory_id', function ($subQuery) use ($categoryId) {
                         $subQuery->select('id')
                             ->from('categories')
