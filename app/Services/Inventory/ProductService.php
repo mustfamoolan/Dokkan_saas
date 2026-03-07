@@ -35,7 +35,15 @@ class ProductService
         }
 
         if (isset($filters['category_id'])) {
-            $query->where('category_id', $filters['category_id']);
+            $categoryId = $filters['category_id'];
+            $query->where(function ($q) use ($categoryId) {
+                $q->where('category_id', $categoryId)
+                    ->orWhereIn('subcategory_id', function ($subQuery) use ($categoryId) {
+                        $subQuery->select('id')
+                            ->from('categories')
+                            ->where('parent_id', $categoryId);
+                    });
+            });
         }
 
         if (isset($filters['subcategory_id'])) {
