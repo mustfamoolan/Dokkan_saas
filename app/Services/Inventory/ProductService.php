@@ -392,46 +392,54 @@ class ProductService
         $product->tags()->sync($tagIds);
     }
 
-    /**
-     * Get recommended products based on the given product
-     */
-    public function getRecommendedProducts(Product $product, int $limit = 10): \Illuminate\Database\Eloquent\Collection
+    public function getRecommendedProducts(Product $product, int $limit = 10): array
     {
-        $query = Product::with(['category', 'subcategory', 'images', 'tags'])
+        $baseQuery = Product::with(['category', 'subcategory', 'images', 'tags'])
             ->where('id', '!=', $product->id)
             ->where('is_active', true);
 
+        $results = [];
+
+        // 1. Same Author
+        if ($product->author) {
+            $results['same_author'] = (clone $baseQuery)
+                ->where('author', $product->author)
+                ->inRandomOrder()
+                ->limit($limit)
+                ->get();
+        }
+
+        // 2. Same Subcategory
+        if ($product->subcategory_id) {
+            $results['same_subcategory'] = (clone $baseQuery)
+                ->where('subcategory_id', $product->subcategory_id)
+                ->inRandomOrder()
+                ->limit($limit)
+                ->get();
+        }
+
+        // 3. Same Publisher
+        if ($product->publisher) {
+            $results['same_publisher'] = (clone $baseQuery)
+                ->where('publisher', $product->publisher)
+                ->inRandomOrder()
+                ->limit($limit)
+                ->get();
+        }
+
+        // 4. Same Tags
         $tagIds = $product->tags->pluck('id')->toArray();
-
-        $query->where(function ($q) use ($product, $tagIds) {
-            // Match subcategory
-            if ($product->subcategory_id) {
-                $q->orWhere('subcategory_id', $product->subcategory_id);
-            }
-
-            // Match parent category if no subcategory or to broaden results
-            $q->orWhere('category_id', $product->category_id);
-
-            // Match same publisher
-            if ($product->publisher) {
-                $q->orWhere('publisher', $product->publisher);
-            }
-
-            // Match same author
-            if ($product->author) {
-                $q->orWhere('author', $product->author);
-            }
-
-            // Match tags
-            if (!empty($tagIds)) {
-                $q->orWhereHas('tags', function ($tagQuery) use ($tagIds) {
+        if (!empty($tagIds)) {
+            $results['same_tags'] = (clone $baseQuery)
+                ->whereHas('tags', function ($tagQuery) use ($tagIds) {
                     $tagQuery->whereIn('tags.id', $tagIds);
-                });
-            }
-        });
+                })
+                ->inRandomOrder()
+                ->limit($limit)
+                ->get();
+        }
 
-        // Order by relevance (this is a simple approach, can be improved)
-        return $query->inRandomOrder()->limit($limit)->get();
+        return $results;
     }
 
     /**

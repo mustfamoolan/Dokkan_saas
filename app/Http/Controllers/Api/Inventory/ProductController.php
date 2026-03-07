@@ -134,6 +134,13 @@ class ProductController extends Controller
     {
         $recommendations = $this->productService->getRecommendedProducts($product);
 
-        return ProductResource::collection($recommendations)->response()->setStatusCode(200);
+        $data = [];
+        foreach ($recommendations as $key => $collection) {
+            $data[$key] = ProductResource::collection($collection);
+        }
+
+        return response()->json([
+            'data' => $data
+        ], 200);
     }
 }
