@@ -22,9 +22,14 @@ class OrderCommissionSettingsController extends Controller
         $settings = $this->commissionService->getCommissionSettings()->first();
         $exceptions = $this->commissionService->getCommissionExceptions();
 
+        $users = \App\Models\User::where('is_active', true)->select('id', 'name')->get();
+        $representatives = \App\Models\Representative::where('is_active', true)->select('id', 'name')->get();
+
         return response()->json([
             'settings' => $settings,
             'exceptions' => $exceptions,
+            'users' => $users,
+            'representatives' => $representatives,
         ]);
     }
 

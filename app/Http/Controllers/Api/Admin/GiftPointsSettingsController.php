@@ -22,9 +22,14 @@ class GiftPointsSettingsController extends Controller
         $settings = $this->pointsService->getSettings()->first();
         $exceptions = $this->pointsService->getExceptions();
 
+        $users = \App\Models\User::where('is_active', true)->select('id', 'name')->get();
+        $representatives = \App\Models\Representative::where('is_active', true)->select('id', 'name')->get();
+
         return response()->json([
             'settings' => $settings,
             'exceptions' => $exceptions,
+            'users' => $users,
+            'representatives' => $representatives,
         ]);
     }
 
