@@ -115,10 +115,8 @@ Route::prefix('admin')->group(function () {
         Route::post('/ai/generate-product-description', [\App\Http\Controllers\Api\AI\ProductDescriptionController::class, 'generate'])->name('api.admin.ai.generate-product-description');
 
         // Representatives routes
-        Route::prefix('representatives')->group(function () {
-            Route::get('representatives/{representative}/statistics', [RepresentativeController::class, 'statistics']);
-            Route::apiResource('representatives', RepresentativeController::class);
-        });
+        Route::get('representatives/{representative}/statistics', [RepresentativeController::class, 'statistics']);
+        Route::apiResource('representatives', RepresentativeController::class);
 
         // Orders routes
         Route::apiResource('orders', \App\Http\Controllers\Api\Admin\OrderController::class)->only(['index', 'show']);
