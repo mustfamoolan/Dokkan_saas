@@ -11,6 +11,8 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\WithdrawalRequestController;
 use App\Http\Controllers\Admin\WithdrawalSettingsController;
+use App\Http\Controllers\Admin\ExpenseController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Inventory\CategoryController;
 use App\Http\Controllers\Inventory\ProductController;
 use App\Http\Controllers\Inventory\SupplierController;
@@ -161,6 +163,16 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     ]);
     Route::post('tags/check-duplicate', [\App\Http\Controllers\Admin\TagController::class, 'checkDuplicate'])->name('admin.tags.check-duplicate');
 
+    // Expenses routes
+    Route::resource('expenses', ExpenseController::class)->names([
+        'index' => 'admin.expenses.index',
+        'create' => 'admin.expenses.create',
+        'store' => 'admin.expenses.store',
+        'edit' => 'admin.expenses.edit',
+        'update' => 'admin.expenses.update',
+        'destroy' => 'admin.expenses.destroy',
+    ]);
+
     // Order Commission Settings
     Route::prefix('settings/order-commission')->name('admin.settings.order-commission.')->group(function () {
         Route::get('/', [OrderCommissionSettingsController::class, 'index'])->name('index');
@@ -173,4 +185,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
         Route::put('/exceptions/{id}', [OrderCommissionSettingsController::class, 'updateException'])->name('exceptions.update');
         Route::delete('/exceptions/{id}', [OrderCommissionSettingsController::class, 'destroyException'])->name('exceptions.destroy');
     });
+
+    // Reports
+    Route::get('reports', [ReportController::class, 'index'])->name('admin.reports.index');
 });

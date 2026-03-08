@@ -389,7 +389,23 @@
 
         <!-- التقارير والإشعارات -->
         <div class="col-xl-3 col-md-4 col-sm-6 mb-4">
-            <a href="#" class="card dashboard-card text-decoration-none">
+            <a href="{{ route('admin.expenses.index') }}" class="card dashboard-card text-decoration-none">
+                <div class="card-decoration-circle" style="background: rgba(220, 53, 69, 0.15);"></div>
+                <iconify-icon icon="solar:bill-list-bold-duotone" class="card-background-icon"
+                    style="color: #dc3545;"></iconify-icon>
+                <div class="card-content">
+                    <div class="card-icon-container" style="background: rgba(220, 53, 69, 0.15);">
+                        <iconify-icon icon="solar:bill-list-bold-duotone" class="fs-28"
+                            style="color: #dc3545;"></iconify-icon>
+                    </div>
+                    <span class="card-title-text">المصروفات</span>
+                    <span class="card-subtitle-text">تكاليف التشغيل</span>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-xl-3 col-md-4 col-sm-6 mb-4">
+            <a href="{{ route('admin.reports.index') }}" class="card dashboard-card text-decoration-none">
                 <div class="card-decoration-circle" style="background: rgba(255, 193, 7, 0.15);"></div>
                 <iconify-icon icon="solar:chart-bold-duotone" class="card-background-icon"
                     style="color: #ffc107;"></iconify-icon>
