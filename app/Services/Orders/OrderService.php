@@ -267,11 +267,20 @@ class OrderService
             // Award Gift Points
             $this->giftPointsService->awardPoints($order);
 
+            $oldStatus = $order->status->value;
+
             // Update order status
             $order->update([
                 'status' => OrderStatus::COMPLETED,
                 'completed_at' => now(),
             ]);
+
+            // Send notification
+            try {
+                app(\App\Services\Notifications\NotificationService::class)->sendOrderStatusNotification($order, $oldStatus, OrderStatus::COMPLETED->value);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Error triggering order completion notification: ' . $e->getMessage());
+            }
 
             return $order->fresh();
         });
@@ -287,10 +296,19 @@ class OrderService
             return $this->completeOrder($order);
         }
 
+        $oldStatus = $order->status->value;
+
         $order->update([
             'status' => $status,
             'completed_at' => $status === OrderStatus::COMPLETED ? now() : null,
         ]);
+
+        // Send notification
+        try {
+            app(\App\Services\Notifications\NotificationService::class)->sendOrderStatusNotification($order, $oldStatus, $status->value);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error triggering order status change notification: ' . $e->getMessage());
+        }
 
         return $order->fresh();
     }

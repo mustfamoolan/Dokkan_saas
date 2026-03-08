@@ -41,10 +41,14 @@ class NotificationService
             // Create notification instance
             $notification = new LowStockNotification($product);
 
-            // Send notification to each user and save to database
+            // Send notification to each user
             foreach ($users as $user) {
                 try {
-                    // Save notification to database
+                    // Send via Laravel Notification System (Database + FCM)
+                    $user->notify($notification);
+
+                    // Also save to our custom 'notifications' table for the specific app logic
+                    // if it's not already being handled by the 'database' channel in Notification
                     $this->saveNotificationToDatabase($user, [
                         'type' => 'low_stock',
                         'title' => 'تنبيه: مخزون منخفض',
@@ -58,38 +62,10 @@ class NotificationService
                         ],
                     ]);
 
-                    // Send FCM notification if user has token
-                    if ($user->fcm_token) {
-                        Log::info('Sending FCM notification to user', [
-                            'user_id' => $user->id,
-                            'user_name' => $user->name,
-                            'fcm_token' => substr($user->fcm_token, 0, 20) . '...',
-                            'product_id' => $product->id,
-                        ]);
-
-                        try {
-                            $user->notify($notification);
-                            Log::info('FCM notification sent successfully to user', [
-                                'user_id' => $user->id,
-                                'product_id' => $product->id,
-                            ]);
-                        } catch (\Exception $e) {
-                            Log::error('Error sending FCM notification', [
-                                'user_id' => $user->id,
-                                'product_id' => $product->id,
-                                'error' => $e->getMessage(),
-                                'error_class' => get_class($e),
-                                'trace' => $e->getTraceAsString(),
-                            ]);
-
-                            // Continue with other users even if one fails
-                        }
-                    } else {
-                        Log::warning('User does not have FCM token', [
-                            'user_id' => $user->id,
-                            'user_name' => $user->name,
-                        ]);
-                    }
+                    Log::info('Low stock notification sent to user', [
+                        'user_id' => $user->id,
+                        'product_id' => $product->id,
+                    ]);
                 } catch (\Exception $e) {
                     Log::error('Failed to send notification to user', [
                         'user_id' => $user->id,
@@ -171,13 +147,28 @@ class NotificationService
 
             foreach ($admins as $admin) {
                 try {
+                    // Send via Laravel Notification System (Database + FCM)
                     $admin->notify($notification);
-                    Log::info('New order FCM notification sent to admin', [
+
+                    // Save to our custom 'notifications' table
+                    $this->saveNotificationToDatabase($admin, [
+                        'type' => 'order',
+                        'title' => 'طلب جديد # ' . $order->id,
+                        'body' => "تم استلام طلب جديد من {$order->customer_name} بمبلغ " . number_format($order->total_amount) . " د.ع",
+                        'data' => [
+                            'type' => 'order',
+                            'id' => $order->id,
+                            'customer_name' => $order->customer_name,
+                            'total_amount' => $order->total_amount,
+                        ],
+                    ]);
+
+                    Log::info('New order notification sent to admin', [
                         'admin_id' => $admin->id,
                         'order_id' => $order->id,
                     ]);
                 } catch (\Exception $e) {
-                    Log::error('Error sending new order FCM notification', [
+                    Log::error('Error sending new order notification', [
                         'admin_id' => $admin->id,
                         'order_id' => $order->id,
                         'error' => $e->getMessage(),
@@ -210,13 +201,30 @@ class NotificationService
 
             foreach ($admins as $admin) {
                 try {
+                    // Send via Laravel Notification System (Database + FCM)
                     $admin->notify($notification);
-                    Log::info('Withdrawal request FCM notification sent to admin', [
+
+                    // Save to our custom 'notifications' table
+                    $this->saveNotificationToDatabase($admin, [
+                        'type' => 'withdrawal_request',
+                        'title' => 'طلب سحب جديد',
+                        'body' => "طلب سحب جديد من {$request->representative->name} بمبلغ " . number_format($request->amount) . " د.ع",
+                        'data' => [
+                            'type' => 'withdrawal_request',
+                            'id' => $request->id,
+                            'representative_id' => $request->representative->id,
+                            'representative_name' => $request->representative->name,
+                            'amount' => $request->amount,
+                            'url' => route('admin.withdrawals.show', $request),
+                        ],
+                    ]);
+
+                    Log::info('Withdrawal request notification sent to admin', [
                         'admin_id' => $admin->id,
                         'request_id' => $request->id,
                     ]);
                 } catch (\Exception $e) {
-                    Log::error('Error sending withdrawal FCM notification', [
+                    Log::error('Error sending withdrawal notification', [
                         'admin_id' => $admin->id,
                         'request_id' => $request->id,
                         'error' => $e->getMessage(),
@@ -226,6 +234,54 @@ class NotificationService
         } catch (\Exception $e) {
             Log::error('Failed to send withdrawal notifications', [
                 'request_id' => $request->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Send order status change notification
+     */
+    public function sendOrderStatusNotification(\App\Models\Order $order, string $oldStatus, string $newStatus): void
+    {
+        try {
+            // Get admins to notify
+            $admins = User::role('admin')->where('is_active', true)->get();
+
+            if ($admins->isEmpty()) {
+                return;
+            }
+
+            $notification = new \App\Notifications\OrderStatusNotification($order, $oldStatus, $newStatus);
+
+            foreach ($admins as $admin) {
+                try {
+                    // Send via Laravel Notification System (Database + FCM)
+                    $admin->notify($notification);
+
+                    // Save to our custom 'notifications' table
+                    $this->saveNotificationToDatabase($admin, [
+                        'type' => 'order_status_change',
+                        'title' => 'تحديث حالة الطلب # ' . $order->id,
+                        'body' => "تغيرت حالة الطلب من {$oldStatus} إلى {$newStatus}",
+                        'data' => [
+                            'type' => 'order_status_change',
+                            'id' => $order->id,
+                            'old_status' => $oldStatus,
+                            'new_status' => $newStatus,
+                        ],
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error('Error sending order status notification', [
+                        'admin_id' => $admin->id,
+                        'order_id' => $order->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to send order status notifications', [
+                'order_id' => $order->id,
                 'error' => $e->getMessage(),
             ]);
         }
