@@ -88,16 +88,22 @@ class RepresentativeController extends Controller
             ->map(function ($tx) {
                 return [
                     'id' => $tx->id,
-                    'type' => $tx->type->label(),
+                    'type' => $tx->type->getLabel(),
                     'amount' => $tx->amount,
                     'description' => $tx->description,
-                    'status' => $tx->status->label(),
+                    'status' => $tx->status->getLabel(),
                     'date' => $tx->created_at->format('Y-m-d H:i')
                 ];
             });
 
         return response()->json([
             'data' => [
+                'representative' => [
+                    'id' => $representative->id,
+                    'balance' => $representative->balance,
+                    'available_balance' => $representative->available_balance,
+                    'pending_withdrawals_amount' => $representative->pending_withdrawals_amount,
+                ],
                 'total_sales_amount' => $totalSales,
                 'completed_orders_count' => $completedOrdersCount,
                 'completion_rate' => $completionRate,
