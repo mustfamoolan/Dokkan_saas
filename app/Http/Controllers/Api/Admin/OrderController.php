@@ -1,0 +1,100 @@
+<?php
+
+namespace App\Http\Controllers\Api\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Http\Resources\Admin\OrderResource;
+use App\Models\Order;
+use App\Services\Orders\OrderService;
+use App\Enums\OrderStatus;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+
+class OrderController extends Controller
+{
+    public function __construct(
+        protected OrderService $orderService
+    ) {
+    }
+
+    /**
+     * Display a listing of orders.
+     */
+    public function index(Request $request): JsonResponse
+    {
+        $query = Order::with(['orderItems.product', 'representative', 'createdBy', 'governorate', 'district'])
+            ->latest();
+
+        // Filters
+        if ($request->has('status') && $request->status != '') {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->has('representative_id') && $request->representative_id != '') {
+            $query->where('representative_id', $request->representative_id);
+        }
+
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('customer_name', 'like', "%{$search}%")
+                    ->orWhere('customer_phone', 'like', "%{$search}%")
+                    ->orWhere('id', 'like', "%{$search}%");
+            });
+        }
+
+        $perPage = $request->get('per_page', 15);
+        $orders = $query->paginate($perPage);
+
+        return response()->json([
+            'data' => OrderResource::collection($orders->items()),
+            'meta' => [
+                'current_page' => $orders->currentPage(),
+                'last_page' => $orders->lastPage(),
+                'per_page' => $orders->perPage(),
+                'total' => $orders->total(),
+            ],
+            'stats' => [
+                'total' => Order::count(),
+                'pending' => Order::whereIn('status', ['new', 'prepared'])->count(),
+                'completed' => Order::where('status', 'completed')->count(),
+            ],
+        ]);
+    }
+
+    /**
+     * Display the specified order.
+     */
+    public function show(Order $order): JsonResponse
+    {
+        $order->load(['orderItems.product', 'representative', 'createdBy', 'governorate', 'district', 'gift', 'giftBox']);
+
+        return response()->json([
+            'data' => new OrderResource($order),
+        ]);
+    }
+
+    /**
+     * Update order status.
+     */
+    public function updateStatus(Request $request, Order $order): JsonResponse
+    {
+        $validated = $request->validate([
+            'status' => ['required', 'string', 'in:new,prepared,completed,cancelled,returned,replaced'],
+        ]);
+
+        try {
+            $status = OrderStatus::from($validated['status']);
+            $updatedOrder = $this->orderService->changeOrderStatus($order, $status, auth()->user());
+
+            return response()->json([
+                'message' => 'تم تحديث حالة الطلب بنجاح',
+                'data' => new OrderResource($updatedOrder->load(['orderItems.product', 'representative', 'createdBy', 'governorate', 'district'])),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 422);
+        }
+    }
+}

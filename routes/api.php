@@ -120,6 +120,10 @@ Route::prefix('admin')->group(function () {
             Route::apiResource('representatives', RepresentativeController::class);
         });
 
+        // Orders routes
+        Route::apiResource('orders', \App\Http\Controllers\Api\Admin\OrderController::class)->only(['index', 'show']);
+        Route::post('orders/{order}/status', [\App\Http\Controllers\Api\Admin\OrderController::class, 'updateStatus']);
+
         // Representative Accounts
         Route::prefix('accounts')->middleware('auth:sanctum')->group(function () {
             Route::get('/', [AccountManagementController::class, 'index']);
