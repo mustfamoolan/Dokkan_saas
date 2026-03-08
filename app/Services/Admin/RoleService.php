@@ -18,7 +18,7 @@ class RoleService
             $query->where('name', 'like', "%{$search}%");
         }
 
-        return $query->latest()->paginate($filters['per_page'] ?? 15);
+        return $query->latest()->get();
     }
 
     /**
