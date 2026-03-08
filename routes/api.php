@@ -121,7 +121,7 @@ Route::prefix('admin')->group(function () {
         });
 
         // Representative Accounts
-        Route::prefix('accounts')->group(function () {
+        Route::prefix('accounts')->middleware('auth:sanctum')->group(function () {
             Route::get('/', [AccountManagementController::class, 'index']);
             Route::get('/{representative}', [AccountManagementController::class, 'show']);
             Route::get('/{representative}/transactions', [AccountManagementController::class, 'transactions']);
