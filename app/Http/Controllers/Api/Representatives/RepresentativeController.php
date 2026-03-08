@@ -89,6 +89,7 @@ class RepresentativeController extends Controller
                 return [
                     'id' => $tx->id,
                     'type' => $tx->type->getLabel(),
+                    'type_key' => $tx->type->value,
                     'amount' => $tx->amount,
                     'description' => $tx->description,
                     'status' => $tx->status->getLabel(),
