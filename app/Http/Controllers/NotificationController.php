@@ -129,4 +129,22 @@ class NotificationController extends Controller
             'count' => $count,
         ]);
     }
+
+    /**
+     * Delete the specified notification
+     */
+    public function destroy(int $id): JsonResponse|RedirectResponse
+    {
+        $notification = auth()->user()->notifications()->findOrFail($id);
+        $notification->delete();
+
+        if (request()->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Notification deleted successfully',
+            ]);
+        }
+
+        return back()->with('success', 'تم حذف الإشعار بنجاح');
+    }
 }

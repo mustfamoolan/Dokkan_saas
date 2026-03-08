@@ -109,7 +109,11 @@ Route::prefix('admin')->group(function () {
         Route::get('/fcm/token/status', [\App\Http\Controllers\Api\FCMController::class, 'getTokenStatus'])->name('api.admin.fcm.token.status');
 
         // Notifications routes
+        Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index']);
         Route::get('/notifications/unread-count', [\App\Http\Controllers\NotificationController::class, 'unreadCount'])->name('api.admin.notifications.unread-count');
+        Route::post('/notifications/{notification}/mark-as-read', [\App\Http\Controllers\NotificationController::class, 'markAsRead']);
+        Route::post('/notifications/mark-all-as-read', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead']);
+        Route::delete('/notifications/{id}', [\App\Http\Controllers\NotificationController::class, 'destroy']);
 
         // AI routes
         Route::post('/ai/generate-product-description', [\App\Http\Controllers\Api\AI\ProductDescriptionController::class, 'generate'])->name('api.admin.ai.generate-product-description');
