@@ -9,6 +9,8 @@ use App\Http\Controllers\Api\Inventory\CategoryController;
 use App\Http\Controllers\Api\Inventory\ProductController;
 use App\Http\Controllers\Api\Inventory\SupplierController;
 use App\Http\Controllers\Api\Inventory\TagController;
+use App\Http\Controllers\Api\Admin\ReportApiController;
+use App\Http\Controllers\Api\Admin\ExpenseApiController;
 use App\Http\Controllers\Api\Representatives\AccountManagementController;
 use App\Http\Controllers\Api\Representatives\RepresentativeController;
 use Illuminate\Http\Request;
@@ -142,5 +144,12 @@ Route::prefix('admin')->group(function () {
             Route::post('/{representative}/add-balance', [AccountManagementController::class, 'addBalance']);
             Route::post('/{representative}/direct-withdraw', [AccountManagementController::class, 'directWithdraw']);
         });
+
+        // Expenses routes
+        Route::get('expenses/categories', [ExpenseApiController::class, 'categories']);
+        Route::apiResource('expenses', ExpenseApiController::class);
+
+        // Reports routes
+        Route::get('reports', [ReportApiController::class, 'index']);
     });
 });
