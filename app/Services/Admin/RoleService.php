@@ -11,7 +11,7 @@ class RoleService
      */
     public function getAllRoles(array $filters = []): \Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
-        $query = Role::with('permissions', 'users');
+        $query = Role::with('permissions');
 
         if (isset($filters['search'])) {
             $search = $filters['search'];
