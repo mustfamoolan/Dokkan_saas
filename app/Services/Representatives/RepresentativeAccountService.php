@@ -106,27 +106,10 @@ class RepresentativeAccountService
             ]);
 
             // Send notification to admins
-            $admins = User::whereHas('roles', function ($query) {
-                $query->where('name', 'admin');
-            })->get();
-
-            if ($admins->isNotEmpty()) {
-                $representative = $request->representative;
-                foreach ($admins as $admin) {
-                    Notification::create([
-                        'user_id' => $admin->id,
-                        'type' => 'withdrawal_request',
-                        'title' => 'طلب سحب جديد',
-                        'body' => "طلب سحب جديد من {$representative->name} بمبلغ " . format_currency($request->amount),
-                        'data' => [
-                            'withdrawal_request_id' => $request->id,
-                            'representative_id' => $representative->id,
-                            'representative_name' => $representative->name,
-                            'amount' => $request->amount,
-                            'url' => route('admin.withdrawals.show', $request),
-                        ],
-                    ]);
-                }
+            try {
+                app(\App\Services\Notifications\NotificationService::class)->sendWithdrawalRequestNotification($request);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Error triggering withdrawal notification: ' . $e->getMessage());
             }
 
             return $request;
@@ -147,7 +130,7 @@ class RepresentativeAccountService
                 ->where('status', \App\Enums\WithdrawalStatus::PENDING)
                 ->where('id', '!=', $request->id) // Exclude current request
                 ->sum('amount');
-            
+
             $availableBalance = max(0, (float) $representative->balance - $pendingAmount);
 
             // Validate available balance

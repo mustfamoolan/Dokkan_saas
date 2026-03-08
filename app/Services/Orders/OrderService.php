@@ -107,6 +107,13 @@ class OrderService
                 'created_by' => $user?->id,
             ]);
 
+            // Send notification to admins
+            try {
+                app(\App\Services\Notifications\NotificationService::class)->sendNewOrderNotification($order);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Error triggering new order notification: ' . $e->getMessage());
+            }
+
             return $order;
         });
     }

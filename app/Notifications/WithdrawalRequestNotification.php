@@ -4,8 +4,10 @@ namespace App\Notifications;
 
 use App\Models\WithdrawalRequest;
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Messages\DatabaseMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\Fcm\FcmChannel;
+use NotificationChannels\Fcm\FcmMessage;
+use NotificationChannels\Fcm\Resources\Notification as FcmNotification;
 
 class WithdrawalRequestNotification extends Notification
 {
@@ -26,7 +28,28 @@ class WithdrawalRequestNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['database', FcmChannel::class];
+    }
+
+    /**
+     * Get the FCM representation of the notification.
+     */
+    public function toFcm(object $notifiable): FcmMessage
+    {
+        $representative = $this->withdrawalRequest->representative;
+
+        return FcmMessage::create()
+            ->setData([
+                'type' => 'withdrawal_request',
+                'id' => (string) $this->withdrawalRequest->id,
+                'representative_name' => $representative->name,
+                'amount' => (string) $this->withdrawalRequest->amount,
+            ])
+            ->setNotification(
+                FcmNotification::create()
+                    ->setTitle('طلب سحب جديد')
+                    ->setBody("طلب سحب جديد من {$representative->name} بمبلغ " . number_format($this->withdrawalRequest->amount) . " د.ع")
+            );
     }
 
     /**
@@ -37,16 +60,19 @@ class WithdrawalRequestNotification extends Notification
     public function toArray(object $notifiable): array
     {
         $representative = $this->withdrawalRequest->representative;
-        
+
         return [
             'type' => 'withdrawal_request',
             'title' => 'طلب سحب جديد',
-            'message' => "طلب سحب جديد من {$representative->name} بمبلغ " . format_currency($this->withdrawalRequest->amount),
-            'withdrawal_request_id' => $this->withdrawalRequest->id,
-            'representative_id' => $representative->id,
-            'representative_name' => $representative->name,
-            'amount' => $this->withdrawalRequest->amount,
-            'url' => route('admin.withdrawals.show', $this->withdrawalRequest),
+            'body' => "طلب سحب جديد من {$representative->name} بمبلغ " . number_format($this->withdrawalRequest->amount) . " د.ع",
+            'data' => [
+                'type' => 'withdrawal_request',
+                'id' => $this->withdrawalRequest->id,
+                'representative_id' => $representative->id,
+                'representative_name' => $representative->name,
+                'amount' => $this->withdrawalRequest->amount,
+                'url' => route('admin.withdrawals.show', $this->withdrawalRequest),
+            ],
         ];
     }
 }

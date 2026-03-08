@@ -154,6 +154,84 @@ class NotificationService
     }
 
     /**
+     * Send new order notification to admins
+     */
+    public function sendNewOrderNotification(\App\Models\Order $order): void
+    {
+        try {
+            // Get admins to notify
+            $admins = User::role('admin')->where('is_active', true)->get();
+
+            if ($admins->isEmpty()) {
+                Log::warning('No active admins found for new order notification', ['order_id' => $order->id]);
+                return;
+            }
+
+            $notification = new \App\Notifications\NewOrderNotification($order);
+
+            foreach ($admins as $admin) {
+                try {
+                    $admin->notify($notification);
+                    Log::info('New order FCM notification sent to admin', [
+                        'admin_id' => $admin->id,
+                        'order_id' => $order->id,
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error('Error sending new order FCM notification', [
+                        'admin_id' => $admin->id,
+                        'order_id' => $order->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to send new order notifications', [
+                'order_id' => $order->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Send withdrawal request notification to admins
+     */
+    public function sendWithdrawalRequestNotification(\App\Models\WithdrawalRequest $request): void
+    {
+        try {
+            // Get admins to notify
+            $admins = User::role('admin')->where('is_active', true)->get();
+
+            if ($admins->isEmpty()) {
+                Log::warning('No active admins found for withdrawal notification', ['request_id' => $request->id]);
+                return;
+            }
+
+            $notification = new \App\Notifications\WithdrawalRequestNotification($request);
+
+            foreach ($admins as $admin) {
+                try {
+                    $admin->notify($notification);
+                    Log::info('Withdrawal request FCM notification sent to admin', [
+                        'admin_id' => $admin->id,
+                        'request_id' => $request->id,
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error('Error sending withdrawal FCM notification', [
+                        'admin_id' => $admin->id,
+                        'request_id' => $request->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to send withdrawal notifications', [
+                'request_id' => $request->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
      * Check if product has low stock
      */
     public function checkLowStock(Product $product): bool
