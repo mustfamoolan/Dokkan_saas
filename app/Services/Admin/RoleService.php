@@ -26,7 +26,13 @@ class RoleService
      */
     public function createRole(array $data): Role
     {
-        return Role::create(['name' => $data['name']]);
+        $role = Role::create(['name' => $data['name']]);
+
+        if (isset($data['permissions'])) {
+            $role->syncPermissions($data['permissions']);
+        }
+
+        return $role->fresh();
     }
 
     /**
@@ -35,6 +41,11 @@ class RoleService
     public function updateRole(Role $role, array $data): Role
     {
         $role->update(['name' => $data['name']]);
+
+        if (isset($data['permissions'])) {
+            $role->syncPermissions($data['permissions']);
+        }
+
         return $role->fresh();
     }
 
