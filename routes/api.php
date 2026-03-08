@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\Inventory\CategoryController;
 use App\Http\Controllers\Api\Inventory\ProductController;
 use App\Http\Controllers\Api\Inventory\SupplierController;
 use App\Http\Controllers\Api\Inventory\TagController;
+use App\Http\Controllers\Api\Representatives\AccountManagementController;
 use App\Http\Controllers\Api\Representatives\RepresentativeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -117,6 +118,15 @@ Route::prefix('admin')->group(function () {
     // Representatives routes
     Route::prefix('representatives')->middleware('auth:sanctum')->group(function () {
         Route::get('representatives/{representative}/statistics', [RepresentativeController::class, 'statistics']);
+
+        // Representative Accounts
+        Route::prefix('accounts')->group(function () {
+            Route::get('/', [AccountManagementController::class, 'index']);
+            Route::get('/{representative}', [AccountManagementController::class, 'show']);
+            Route::get('/{representative}/transactions', [AccountManagementController::class, 'transactions']);
+            Route::post('/{representative}/add-balance', [AccountManagementController::class, 'addBalance']);
+            Route::post('/{representative}/direct-withdraw', [AccountManagementController::class, 'directWithdraw']);
+        });
         Route::apiResource('representatives', RepresentativeController::class);
     });
 });
