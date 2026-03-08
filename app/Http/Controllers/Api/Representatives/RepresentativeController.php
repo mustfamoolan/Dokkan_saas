@@ -7,6 +7,7 @@ use App\Http\Requests\Representatives\StoreRepresentativeRequest;
 use App\Http\Requests\Representatives\UpdateRepresentativeRequest;
 use App\Http\Resources\Representatives\RepresentativeResource;
 use App\Models\Representative;
+use App\Enums\OrderStatus;
 use App\Services\Representatives\RepresentativeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -63,6 +64,45 @@ class RepresentativeController extends Controller
 
         return response()->json([
             'data' => new RepresentativeResource($representative),
+        ]);
+    }
+
+    /**
+     * Get statistics and recent transactions for the specified representative.
+     */
+    public function statistics(Representative $representative): JsonResponse
+    {
+        $this->authorize('representatives.view');
+
+        $totalOrders = $representative->orders()->count();
+        $completedOrdersCount = $representative->orders()->where('status', OrderStatus::COMPLETED->value)->count();
+        $completionRate = $totalOrders > 0 ? round(($completedOrdersCount / $totalOrders) * 100, 2) : 0;
+
+        $totalSales = $representative->orders()->where('status', OrderStatus::COMPLETED->value)->sum('total_amount');
+
+        $transactions = $representative->transactions()
+            ->with(['creator:id,name', 'approver:id,name'])
+            ->latest()
+            ->limit(20)
+            ->get()
+            ->map(function ($tx) {
+                return [
+                    'id' => $tx->id,
+                    'type' => $tx->type->label(),
+                    'amount' => $tx->amount,
+                    'description' => $tx->description,
+                    'status' => $tx->status->label(),
+                    'date' => $tx->created_at->format('Y-m-d H:i')
+                ];
+            });
+
+        return response()->json([
+            'data' => [
+                'total_sales_amount' => $totalSales,
+                'completed_orders_count' => $completedOrdersCount,
+                'completion_rate' => $completionRate,
+                'transactions' => $transactions
+            ]
         ]);
     }
 

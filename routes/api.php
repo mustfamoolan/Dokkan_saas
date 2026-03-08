@@ -116,6 +116,7 @@ Route::prefix('admin')->group(function () {
 
     // Representatives routes
     Route::prefix('representatives')->middleware('auth:sanctum')->group(function () {
+        Route::get('representatives/{representative}/statistics', [RepresentativeController::class, 'statistics']);
         Route::apiResource('representatives', RepresentativeController::class);
     });
 });
