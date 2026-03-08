@@ -113,11 +113,12 @@ Route::prefix('admin')->group(function () {
 
         // AI routes
         Route::post('/ai/generate-product-description', [\App\Http\Controllers\Api\AI\ProductDescriptionController::class, 'generate'])->name('api.admin.ai.generate-product-description');
-    });
 
-    // Representatives routes
-    Route::prefix('representatives')->middleware('auth:sanctum')->group(function () {
-        Route::get('representatives/{representative}/statistics', [RepresentativeController::class, 'statistics']);
+        // Representatives routes
+        Route::prefix('representatives')->group(function () {
+            Route::get('representatives/{representative}/statistics', [RepresentativeController::class, 'statistics']);
+            Route::apiResource('representatives', RepresentativeController::class);
+        });
 
         // Representative Accounts
         Route::prefix('accounts')->group(function () {
@@ -127,6 +128,5 @@ Route::prefix('admin')->group(function () {
             Route::post('/{representative}/add-balance', [AccountManagementController::class, 'addBalance']);
             Route::post('/{representative}/direct-withdraw', [AccountManagementController::class, 'directWithdraw']);
         });
-        Route::apiResource('representatives', RepresentativeController::class);
     });
 });
