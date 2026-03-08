@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\GiftPointsSetting;
 use App\Models\GiftSetting;
-use App\Models\OrderCommissionSetting;
+use App\Models\OrderPreparationCommissionSetting;
 use App\Models\WithdrawalSetting;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -19,7 +19,7 @@ class GeneralSettingsApiController extends Controller
     {
         $withdrawalSetting = WithdrawalSetting::general()->first();
         $rewardPointsSetting = GiftPointsSetting::first();
-        $orderCommissionSetting = OrderCommissionSetting::first();
+        $orderCommissionSetting = OrderPreparationCommissionSetting::active()->first() ?? OrderPreparationCommissionSetting::first();
         $gifts = GiftSetting::gifts()->active()->get();
         $giftBoxes = GiftSetting::giftBoxes()->active()->get();
 
@@ -72,11 +72,11 @@ class GeneralSettingsApiController extends Controller
 
         // Update Order Commission
         if ($request->has('commission_value')) {
-            $orderCommissionSetting = OrderCommissionSetting::first();
+            $orderCommissionSetting = OrderPreparationCommissionSetting::first();
             if ($orderCommissionSetting) {
                 $orderCommissionSetting->update(['commission_value' => $validated['commission_value']]);
             } else {
-                OrderCommissionSetting::create([
+                OrderPreparationCommissionSetting::create([
                     'commission_value' => $validated['commission_value'],
                     'is_active' => true,
                 ]);
