@@ -9,7 +9,7 @@ class EmployeeTypeService
     /**
      * Get all employee types
      */
-    public function getAllEmployeeTypes(array $filters = []): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    public function getAllEmployeeTypes(array $filters = []): \Illuminate\Database\Eloquent\Collection
     {
         $query = EmployeeType::with('roles.permissions', 'users');
 
@@ -25,7 +25,7 @@ class EmployeeTypeService
             $query->where('is_active', $filters['is_active']);
         }
 
-        return $query->latest()->paginate($filters['per_page'] ?? 15);
+        return $query->latest()->get();
     }
 
     /**

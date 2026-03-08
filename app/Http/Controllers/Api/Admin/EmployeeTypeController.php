@@ -23,17 +23,11 @@ class EmployeeTypeController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $filters = $request->only(['search', 'per_page', 'is_active']);
+        $filters = $request->only(['search', 'is_active']);
         $employeeTypes = $this->employeeTypeService->getAllEmployeeTypes($filters);
 
         return response()->json([
-            'data' => EmployeeTypeResource::collection($employeeTypes->items()),
-            'meta' => [
-                'current_page' => $employeeTypes->currentPage(),
-                'last_page' => $employeeTypes->lastPage(),
-                'per_page' => $employeeTypes->perPage(),
-                'total' => $employeeTypes->total(),
-            ],
+            'data' => EmployeeTypeResource::collection($employeeTypes),
         ]);
     }
 

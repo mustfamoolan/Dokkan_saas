@@ -28,6 +28,7 @@ class EmployeeTypeResource extends JsonResource
                             return [
                                 'id' => $permission->id,
                                 'name' => $permission->name,
+                                'name_ar' => permission_label($permission->name),
                             ];
                         }),
                     ];
