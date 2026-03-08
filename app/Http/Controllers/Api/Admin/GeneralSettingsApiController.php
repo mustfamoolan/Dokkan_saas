@@ -72,7 +72,7 @@ class GeneralSettingsApiController extends Controller
 
         // Update Order Commission
         if ($request->has('commission_value')) {
-            $orderCommissionSetting = OrderPreparationCommissionSetting::first();
+            $orderCommissionSetting = OrderPreparationCommissionSetting::active()->first() ?? OrderPreparationCommissionSetting::first();
             if ($orderCommissionSetting) {
                 $orderCommissionSetting->update(['commission_value' => $validated['commission_value']]);
             } else {
