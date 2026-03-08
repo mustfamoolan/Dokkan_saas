@@ -25,7 +25,7 @@ class EmployeeTypeController extends Controller
     public function index(Request $request): View|JsonResponse
     {
         $filters = $request->only(['search', 'per_page', 'is_active']);
-        $employeeTypes = $this->employeeTypeService->getAllEmployeeTypes($filters);
+        $employeeTypes = $this->employeeTypeService->getAllEmployeeTypes($filters, true);
 
         if ($request->expectsJson()) {
             return response()->json($employeeTypes);
