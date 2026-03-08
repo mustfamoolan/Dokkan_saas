@@ -9,7 +9,7 @@ class RoleService
     /**
      * Get all roles
      */
-    public function getAllRoles(array $filters = []): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    public function getAllRoles(array $filters = []): \Illuminate\Database\Eloquent\Collection
     {
         $query = Role::with('permissions');
 

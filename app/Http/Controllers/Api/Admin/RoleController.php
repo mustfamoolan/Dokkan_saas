@@ -23,17 +23,11 @@ class RoleController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $filters = $request->only(['search', 'per_page']);
+        $filters = $request->only(['search']);
         $roles = $this->roleService->getAllRoles($filters);
 
         return response()->json([
-            'data' => RoleResource::collection($roles->items()),
-            'meta' => [
-                'current_page' => $roles->currentPage(),
-                'last_page' => $roles->lastPage(),
-                'per_page' => $roles->perPage(),
-                'total' => $roles->total(),
-            ],
+            'data' => RoleResource::collection($roles),
         ]);
     }
 

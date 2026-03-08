@@ -23,17 +23,11 @@ class PermissionController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $filters = $request->only(['search', 'per_page']);
+        $filters = $request->only(['search']);
         $permissions = $this->permissionService->getAllPermissions($filters);
 
         return response()->json([
-            'data' => PermissionResource::collection($permissions->items()),
-            'meta' => [
-                'current_page' => $permissions->currentPage(),
-                'last_page' => $permissions->lastPage(),
-                'per_page' => $permissions->perPage(),
-                'total' => $permissions->total(),
-            ],
+            'data' => PermissionResource::collection($permissions),
         ]);
     }
 

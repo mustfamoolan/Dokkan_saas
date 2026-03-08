@@ -9,7 +9,7 @@ class PermissionService
     /**
      * Get all permissions
      */
-    public function getAllPermissions(array $filters = []): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    public function getAllPermissions(array $filters = []): \Illuminate\Database\Eloquent\Collection
     {
         $query = Permission::with('roles');
 
