@@ -20,6 +20,7 @@ class RepresentativeResource extends JsonResource
             'phone' => $this->phone,
             'email' => $this->email,
             'image' => $this->image ? asset('storage/' . $this->image) : null,
+            'image_url' => $this->image ? asset('storage/' . $this->image) : null,
             'address' => $this->address,
             'is_active' => $this->is_active,
             'balance' => $this->balance,

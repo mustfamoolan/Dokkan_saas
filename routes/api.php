@@ -126,6 +126,14 @@ Route::prefix('admin')->group(function () {
         Route::apiResource('orders', \App\Http\Controllers\Api\Admin\OrderController::class)->only(['index', 'show']);
         Route::post('orders/{order}/status', [\App\Http\Controllers\Api\Admin\OrderController::class, 'updateStatus']);
 
+        // Withdrawal Requests
+        Route::prefix('withdrawals')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Api\Representatives\WithdrawalRequestController::class, 'index']);
+            Route::get('/{withdrawalRequest}', [\App\Http\Controllers\Api\Representatives\WithdrawalRequestController::class, 'show']);
+            Route::post('/{withdrawalRequest}/approve', [\App\Http\Controllers\Api\Representatives\WithdrawalRequestController::class, 'approve']);
+            Route::post('/{withdrawalRequest}/reject', [\App\Http\Controllers\Api\Representatives\WithdrawalRequestController::class, 'reject']);
+        });
+
         // Representative Accounts
         Route::prefix('accounts')->middleware('auth:sanctum')->group(function () {
             Route::get('/', [AccountManagementController::class, 'index']);
