@@ -11,11 +11,11 @@ class EmployeeTypeService
      */
     public function getAllEmployeeTypes(array $filters = []): \Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
-        $query = EmployeeType::with('roles', 'users');
+        $query = EmployeeType::with('roles.permissions', 'users');
 
         if (isset($filters['search'])) {
             $search = $filters['search'];
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('description', 'like', "%{$search}%");
             });

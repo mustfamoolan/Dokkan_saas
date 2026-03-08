@@ -24,6 +24,12 @@ class EmployeeTypeResource extends JsonResource
                     return [
                         'id' => $role->id,
                         'name' => $role->name,
+                        'permissions' => $role->permissions->map(function ($permission) {
+                            return [
+                                'id' => $permission->id,
+                                'name' => $permission->name,
+                            ];
+                        }),
                     ];
                 });
             }),
