@@ -79,10 +79,17 @@ class OrderController extends Controller
      */
     public function checkout(): JsonResponse
     {
+        $representative = auth()->user();
+        
+        // Calculate preparation commission for this representative
+        $commission = \App\Models\OrderPreparationCommissionSetting::getCommissionForOrder(new \App\Models\Order(['representative_id' => $representative->id]));
+
         return response()->json([
+            'governorate_id' => $representative->governorate_id, // Useful for defaulting
             'governorates' => \App\Models\Governorate::active()->orderBy('name')->get(['id', 'name']),
             'gifts' => \App\Models\GiftSetting::gifts()->active()->orderBy('name')->get(),
             'giftBoxes' => \App\Models\GiftSetting::giftBoxes()->active()->orderBy('min_books')->get(),
+            'preparation_commission' => (float) $commission,
         ]);
     }
 
