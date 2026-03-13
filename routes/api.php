@@ -153,3 +153,15 @@ Route::prefix('admin')->group(function () {
         Route::get('reports', [ReportApiController::class, 'index']);
     });
 });
+
+// Representative API Routes
+Route::prefix('representative')->group(function () {
+    // Auth routes (no authentication required)
+    Route::post('/login', [\App\Http\Controllers\Api\Representatives\AuthController::class, 'login']);
+
+    // Protected routes (require authentication)
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/profile', [\App\Http\Controllers\Api\Representatives\AuthController::class, 'profile']);
+        Route::post('/logout', [\App\Http\Controllers\Api\Representatives\AuthController::class, 'logout']);
+    });
+});
