@@ -169,5 +169,9 @@ Route::prefix('representative')->group(function () {
         Route::get('/products/{product}', [\App\Http\Controllers\Api\Inventory\ProductController::class, 'show']);
         Route::get('/products/{product}/recommendations', [\App\Http\Controllers\Api\Inventory\ProductController::class, 'recommendations']);
         Route::get('/categories', [\App\Http\Controllers\Api\Inventory\CategoryController::class, 'index']);
+
+        // Orders routes for representatives
+        Route::get('/orders', [\App\Http\Controllers\Api\Representatives\OrderController::class, 'index']);
+        Route::get('/orders/{order}', [\App\Http\Controllers\Api\Representatives\OrderController::class, 'show']);
     });
 });
