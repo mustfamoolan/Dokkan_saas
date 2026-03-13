@@ -163,5 +163,11 @@ Route::prefix('representative')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/profile', [\App\Http\Controllers\Api\Representatives\AuthController::class, 'profile']);
         Route::post('/logout', [\App\Http\Controllers\Api\Representatives\AuthController::class, 'logout']);
+
+        // Inventory routes for representatives
+        Route::get('/products', [\App\Http\Controllers\Api\Inventory\ProductController::class, 'index']);
+        Route::get('/products/{product}', [\App\Http\Controllers\Api\Inventory\ProductController::class, 'show']);
+        Route::get('/products/{product}/recommendations', [\App\Http\Controllers\Api\Inventory\ProductController::class, 'recommendations']);
+        Route::get('/categories', [\App\Http\Controllers\Api\Inventory\CategoryController::class, 'index']);
     });
 });
