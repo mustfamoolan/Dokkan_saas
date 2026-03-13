@@ -172,6 +172,9 @@ Route::prefix('representative')->group(function () {
 
         // Orders routes for representatives
         Route::get('/orders', [\App\Http\Controllers\Api\Representatives\OrderController::class, 'index']);
+        Route::post('/orders', [\App\Http\Controllers\Api\Representatives\OrderController::class, 'store']);
+        Route::get('/orders/checkout', [\App\Http\Controllers\Api\Representatives\OrderController::class, 'checkout']);
+        Route::get('/orders/districts/{governorate}', [\App\Http\Controllers\Api\Representatives\OrderController::class, 'getDistricts']);
         Route::get('/orders/{order}', [\App\Http\Controllers\Api\Representatives\OrderController::class, 'show']);
     });
 });

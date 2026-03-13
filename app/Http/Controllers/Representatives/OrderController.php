@@ -209,12 +209,20 @@ class OrderController extends Controller
     /**
      * Display the checkout page.
      */
-    public function checkout(): View
+    public function checkout(Request $request)
     {
         $governorates = Governorate::active()->orderBy('name')->get();
         $gifts = GiftSetting::gifts()->active()->orderBy('name')->get();
         $giftBoxes = GiftSetting::giftBoxes()->active()->orderBy('min_books')->get();
         
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'governorates' => $governorates,
+                'gifts' => $gifts,
+                'giftBoxes' => $giftBoxes,
+            ]);
+        }
+
         return view('representatives.orders.checkout', compact('governorates', 'gifts', 'giftBoxes'));
     }
 

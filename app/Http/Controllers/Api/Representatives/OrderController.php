@@ -73,4 +73,87 @@ class OrderController extends Controller
             'data' => new OrderResource($order),
         ]);
     }
+
+    /**
+     * Get data required for order checkout (governorates, gifts, boxes).
+     */
+    public function checkout(): JsonResponse
+    {
+        return response()->json([
+            'governorates' => \App\Models\Governorate::active()->orderBy('name')->get(['id', 'name']),
+            'gifts' => \App\Models\GiftSetting::gifts()->active()->orderBy('name')->get(),
+            'giftBoxes' => \App\Models\GiftSetting::giftBoxes()->active()->orderBy('min_books')->get(),
+        ]);
+    }
+
+    /**
+     * Get districts for a governorate.
+     */
+    public function getDistricts($governorateId): JsonResponse
+    {
+        try {
+            $districts = \App\Models\District::where('governorate_id', $governorateId)
+                ->where('is_active', true)
+                ->orderBy('name')
+                ->get(['id', 'name']);
+
+            return response()->json($districts);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'حدث خطأ أثناء جلب المناطق'], 500);
+        }
+    }
+
+    /**
+     * Store a new order.
+     */
+    public function store(Request $request): JsonResponse
+    {
+        $representative = auth()->user();
+
+        $validated = $request->validate([
+            'customer_name' => ['required', 'string', 'max:255'],
+            'customer_address' => ['required', 'string'],
+            'customer_phone' => ['required', 'string', 'max:255'],
+            'customer_phone_2' => ['nullable', 'string', 'max:255'],
+            'customer_social_media' => ['nullable', 'string', 'max:255'],
+            'customer_notes' => ['nullable', 'string'],
+            'governorate_id' => ['required', 'exists:governorates,id'],
+            'district_id' => ['nullable', 'exists:districts,id'],
+            'gift_id' => ['nullable', 'exists:gift_settings,id'],
+            'gift_box_id' => ['nullable', 'exists:gift_settings,id'],
+            'items' => ['required', 'array', 'min:1'],
+            'items.*.product_id' => ['required', 'exists:products,id'],
+            'items.*.quantity' => ['required', 'integer', 'min:1'],
+            'items.*.customer_price' => ['required', 'numeric', 'min:0.01'],
+        ]);
+
+        try {
+            $orderService = app(\App\Services\Orders\OrderService::class);
+            
+            // Create order
+            $order = $orderService->createOrder(
+                $validated,
+                $representative,
+                null
+            );
+
+            // Add items to order
+            foreach ($validated['items'] as $item) {
+                $product = \App\Models\Product::findOrFail($item['product_id']);
+                $orderService->addItemToOrder(
+                    $order,
+                    $product,
+                    $item['quantity'],
+                    (float) $item['customer_price']
+                );
+            }
+
+            return response()->json([
+                'message' => 'تم إنشاء الطلب بنجاح',
+                'order' => new OrderResource($order),
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
 }
