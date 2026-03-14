@@ -2,32 +2,30 @@
 
 namespace Database\Seeders;
 
-use Database\Seeders\Admin\AdminUserSeeder;
-use Database\Seeders\Admin\RolePermissionSeeder;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
     /**
      * Seed the application's database.
      */
     public function run(): void
     {
-        // Seed roles and permissions first
-        $this->call(RolePermissionSeeder::class);
+        // Create Admin User
+        $admin = User::firstOrCreate(
+            ['phone' => '07742209251'],
+            [
+                'name' => 'Dokkan Admin',
+                'email' => 'admin@dokkan.com',
+                'password' => Hash::make('12345678'),
+            ]
+        );
 
-        // Then seed admin user
-        $this->call(AdminUserSeeder::class);
-
-        // Seed inventory data
-        $this->call(\Database\Seeders\Inventory\CategorySeeder::class);
-        $this->call(\Database\Seeders\Inventory\TagSeeder::class);
-
-        // Seed governorates and districts
-        $this->call(GovernorateSeeder::class);
-        $this->call(DistrictSeeder::class);
+        // Create Admin Role if it doesn't exist
+        $role = Role::firstOrCreate(['name' => 'admin']);
+        $admin->assignRole($role);
     }
 }
