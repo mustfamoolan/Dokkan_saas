@@ -11,7 +11,7 @@
 
                     <!-- Title -->
                     <div class="topbar-item">
-                         <h4 class="fw-bold mb-0">@yield('title', 'Dashboard')</h4>
+                         <h4 class="fw-bold mb-0">@yield('title', 'لوحة التحكم')</h4>
                     </div>
                </div>
 
@@ -25,17 +25,17 @@
                          </button>
                          <div class="dropdown-menu dropdown-menu-end">
                               <!-- item-->
-                              <h6 class="dropdown-header">Welcome {{ auth('admin')->user()->name ?? 'Admin' }}!</h6>
+                              <h6 class="dropdown-header">مرحباً {{ auth('admin')->user()->name ?? 'مدير' }}!</h6>
                               <a class="dropdown-item" href="#">
                                    <i class="bx bx-user-circle font-size-16 align-middle me-1"></i>
-                                   <span>Profile</span>
+                                   <span>الملف الشخصي</span>
                               </a>
                               <div class="dropdown-divider"></div>
                               <form action="{{ route('admin.logout') }}" method="POST">
                                    @csrf
                                    <button type="submit" class="dropdown-item text-danger">
                                         <i class="bx bx-log-out font-size-16 align-middle me-1"></i>
-                                        <span>Logout</span>
+                                        <span>تسجيل الخروج</span>
                                    </button>
                               </form>
                          </div>

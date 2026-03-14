@@ -1,25 +1,25 @@
 @extends('admin.layouts.admin-layout')
 
-@section('title', 'Admins Management')
+@section('title', 'إدارة المشرفين')
 
 @section('content')
 <div class="row">
     <div class="col-12">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h4 class="card-title mb-0">Admins List</h4>
-                <button class="btn btn-sm btn-primary">Add Admin</button>
+                <h4 class="card-title mb-0">قائمة المشرفين</h4>
+                <button class="btn btn-sm btn-primary">إضافة مشرف</button>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-centered table-nowrap mb-0">
                         <thead class="bg-light">
                             <tr>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Status</th>
-                                <th>Roles</th>
-                                <th>Actions</th>
+                                <th>الاسم</th>
+                                <th>البريد الإلكتروني</th>
+                                <th>الحالة</th>
+                                <th>الأدوار</th>
+                                <th>العمليات</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -29,7 +29,7 @@
                                 <td>{{ $admin->email }}</td>
                                 <td>
                                     <span class="badge {{ $admin->status === 'active' ? 'bg-success' : 'bg-danger' }}">
-                                        {{ ucfirst($admin->status) }}
+                                        {{ $admin->status === 'active' ? 'نشط' : 'غير نشط' }}
                                     </span>
                                 </td>
                                 <td>
@@ -38,7 +38,7 @@
                                     @endforeach
                                 </td>
                                 <td>
-                                    <button class="btn btn-sm btn-soft-primary">Edit</button>
+                                    <button class="btn btn-sm btn-soft-primary">تعديل</button>
                                 </td>
                             </tr>
                             @endforeach
