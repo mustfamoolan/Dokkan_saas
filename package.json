@@ -1,5 +1,5 @@
 {
-  "name": "larkon",
+  "name": "dokkan",
   "type": "module",
   "scripts": {
     "dev": "vite",
