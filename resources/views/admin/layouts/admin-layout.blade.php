@@ -4,18 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ config('app.name') }} - Admin</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/scss/app.scss', 'resources/js/app.js', 'resources/js/config.js', 'resources/js/layout.js'])
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900">
+<body>
     
-    @include('admin.components.navbar')
-    @include('admin.components.sidebar')
+    <!-- Begin page -->
+    <div class="wrapper">
 
-    <div class="p-4 sm:ml-64">
-       <div class="p-4 mt-14">
-          @yield('content')
-       </div>
+        @include('admin.components.navbar')
+        @include('admin.components.sidebar')
+
+        <div class="page-content">
+            <div class="container-fluid">
+                @yield('content')
+            </div>
+        </div>
+
     </div>
+    <!-- END wrapper -->
 
 </body>
 </html>

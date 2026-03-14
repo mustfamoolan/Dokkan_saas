@@ -7,12 +7,19 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [LoginController::class, 'login']);
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+// Guest Admin Routes
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/login', [App\Http\Controllers\Admin\Auth\LoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [App\Http\Controllers\Admin\Auth\LoginController::class, 'login']);
+    Route::post('/logout', [App\Http\Controllers\Admin\Auth\LoginController::class, 'logout'])->name('logout');
 
-Route::middleware(['auth'])->prefix('admin')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('admin.pages.dashboard');
-    })->name('dashboard');
+    // Protected Admin Routes
+    Route::middleware(['admin'])->group(function () {
+        Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/admins', [App\Http\Controllers\Admin\AdminController::class, 'index'])->name('admins');
+        Route::get('/roles', [App\Http\Controllers\Admin\RoleController::class, 'index'])->name('roles');
+        Route::get('/settings', function () {
+            return "Settings Placeholder";
+        })->name('settings');
+    });
 });
