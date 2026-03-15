@@ -7,16 +7,19 @@ use App\Http\Requests\Subscriber\StoreSupplierRequest;
 use App\Models\Supplier;
 use App\Models\UsageCounter;
 use App\Services\PlanUsageService;
+use App\Services\StatementService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class SupplierController extends Controller
 {
     protected $usageService;
+    protected $statementService;
 
-    public function __construct(PlanUsageService $usageService)
+    public function __construct(PlanUsageService $usageService, StatementService $statementService)
     {
         $this->usageService = $usageService;
+        $this->statementService = $statementService;
     }
 
     public function index()
@@ -55,7 +58,8 @@ class SupplierController extends Controller
 
     public function show(Supplier $supplier)
     {
-        return view('subscriber.app.suppliers.show', compact('supplier'));
+        $balanceInfo = $this->statementService->getSupplierBalance($supplier);
+        return view('subscriber.app.suppliers.show', compact('supplier', 'balanceInfo'));
     }
 
     public function edit(Supplier $supplier)

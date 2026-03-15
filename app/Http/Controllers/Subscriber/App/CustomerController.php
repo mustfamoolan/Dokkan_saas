@@ -7,16 +7,19 @@ use App\Http\Requests\Subscriber\StoreCustomerRequest;
 use App\Models\Customer;
 use App\Models\UsageCounter;
 use App\Services\PlanUsageService;
+use App\Services\StatementService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class CustomerController extends Controller
 {
     protected $usageService;
+    protected $statementService;
 
-    public function __construct(PlanUsageService $usageService)
+    public function __construct(PlanUsageService $usageService, StatementService $statementService)
     {
         $this->usageService = $usageService;
+        $this->statementService = $statementService;
     }
 
     public function index()
@@ -55,7 +58,8 @@ class CustomerController extends Controller
 
     public function show(Customer $customer)
     {
-        return view('subscriber.app.customers.show', compact('customer'));
+        $balanceInfo = $this->statementService->getCustomerBalance($customer);
+        return view('subscriber.app.customers.show', compact('customer', 'balanceInfo'));
     }
 
     public function edit(Customer $customer)

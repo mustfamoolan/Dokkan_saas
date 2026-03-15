@@ -103,6 +103,53 @@ class CashboxService
     }
 
     /**
+     * Record a supplier payment and its associated transaction.
+     */
+    public function recordSupplierPayment(array $paymentData)
+    {
+        return DB::transaction(function () use ($paymentData) {
+            $cashbox = Cashbox::findOrFail($paymentData['cashbox_id']);
+
+            // Validate balance
+            if ($cashbox->current_balance < $paymentData['amount']) {
+                throw new Exception('عذراً، رصيد الصندوق غير كافٍ لإتمام عملية الدفع.');
+            }
+
+            $paymentData['payment_number'] = $this->generateSupplierPaymentNumber($paymentData['store_id']);
+            
+            $payment = \App\Models\SupplierPayment::create($paymentData);
+
+            $this->recordTransaction([
+                'cashbox_id' => $payment->cashbox_id,
+                'amount' => $payment->amount,
+                'direction' => 'out',
+                'type' => 'expense',
+                'reference_type' => \App\Models\SupplierPayment::class,
+                'reference_id' => $payment->id,
+                'notes' => 'صرف دفعة للمورد: ' . $payment->supplier->name . ($payment->notes ? ' - ' . $payment->notes : ''),
+            ]);
+
+            return $payment;
+        });
+    }
+
+    public function generateSupplierPaymentNumber($storeId)
+    {
+        $lastPayment = \App\Models\SupplierPayment::where('store_id', $storeId)
+            ->latest('id')
+            ->first();
+
+        if (!$lastPayment) {
+            return 'SPAY-00001';
+        }
+
+        $lastNumber = str_replace('SPAY-', '', $lastPayment->payment_number);
+        $nextNumber = str_pad((int)$lastNumber + 1, 5, '0', STR_PAD_LEFT);
+
+        return 'SPAY-' . $nextNumber;
+    }
+
+    /**
      * Perform a balance adjustment.
      */
     public function adjustBalance(Cashbox $cashbox, $newBalance, $notes = null)

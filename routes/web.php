@@ -72,6 +72,15 @@ Route::name('subscriber.')->group(function () {
 
         // Customer Payments
         Route::resource('customer-payments', App\Http\Controllers\Subscriber\App\CustomerPaymentController::class)->except(['edit', 'update', 'destroy']);
+
+        // Supplier Payments
+        Route::resource('supplier-payments', App\Http\Controllers\Subscriber\App\SupplierPaymentController::class)->except(['edit', 'update', 'destroy']);
+
+        // Debts & Statements
+        Route::get('customers/{customer}/statement', [App\Http\Controllers\Subscriber\App\StatementController::class, 'customerStatement'])->name('customers.statement');
+        Route::get('suppliers/{supplier}/statement', [App\Http\Controllers\Subscriber\App\StatementController::class, 'supplierStatement'])->name('suppliers.statement');
+        Route::get('customer-balances', [App\Http\Controllers\Subscriber\App\StatementController::class, 'customerBalances'])->name('customer-balances');
+        Route::get('supplier-balances', [App\Http\Controllers\Subscriber\App\StatementController::class, 'supplierBalances'])->name('supplier-balances');
     });
 });
 

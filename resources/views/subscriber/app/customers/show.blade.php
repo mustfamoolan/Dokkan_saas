@@ -18,28 +18,24 @@
             </div>
         </div>
 
-        <div class="card">
-            <div class="card-header">
-                <h4 class="card-title">الرصيد الحالي</h4>
+        <div class="card border-0 shadow-sm overflow-hidden mb-4">
+            <div class="card-header bg-white">
+                <h4 class="card-title fw-bold mb-0">صافي الرصيد الحالي</h4>
             </div>
             <div class="card-body">
-                <div class="text-center">
-                    @if($customer->opening_balance_type === 'none')
-                        <h2 class="text-muted">0 <small class="fs-14">د.ع</small></h2>
-                        <p class="text-muted mb-0">لا يوجد رصيد افتتاحي</p>
-                    @else
-                        <h2 class="{{ $customer->opening_balance_type === 'debit' ? 'text-danger' : 'text-success' }}">
-                            {{ number_format($customer->opening_balance, 0) }} <small class="fs-14">د.ع</small>
-                        </h2>
-                        <p class="fw-bold mb-0">
-                            رصيد افتتاحي ({{ $customer->opening_balance_type === 'debit' ? 'مدين/مطلوب منه' : 'دائن/يطلب مبالغ' }})
-                        </p>
-                    @endif
+                <div class="text-center py-2">
+                    <div class="text-muted small mb-1">الرصد المستحق على العميل</div>
+                    <h2 class="fw-bold text-{{ $balanceInfo['color'] }} mb-2">
+                        {{ number_format($balanceInfo['amount'], 2) }} <small class="fs-14">د.ع</small>
+                    </h2>
+                    <div class="badge bg-soft-{{ $balanceInfo['color'] }} text-{{ $balanceInfo['color'] }} px-3 py-2">
+                        {{ $balanceInfo['label'] }}
+                    </div>
                 </div>
-                <hr>
-                <div class="alert alert-info py-2 mb-0">
-                    <small><iconify-icon icon="solar:info-circle-bold"></iconify-icon> سيظهر لاحقاً كشف الحساب والديون والتحصيلات هنا.</small>
-                </div>
+                <hr class="my-4">
+                <a href="{{ route('subscriber.app.customers.statement', $customer) }}" class="btn btn-primary w-100 py-2">
+                    <iconify-icon icon="solar:document-text-bold" class="me-1"></iconify-icon> عرض كشف الحساب التفصيلي
+                </a>
             </div>
         </div>
     </div>

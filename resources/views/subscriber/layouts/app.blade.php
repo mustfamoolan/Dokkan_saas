@@ -82,6 +82,27 @@
                         </a>
                     </li>
 
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('subscriber.app.customer-balances') }}">
+                            <span class="nav-icon"><iconify-icon icon="solar:users-group-rounded-bold"></iconify-icon></span>
+                            <span class="nav-text">أرصدة العملاء</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('subscriber.app.supplier-payments.index') }}">
+                            <span class="nav-icon"><iconify-icon icon="solar:round-transfer-horizontal-bold-duotone" style="transform: rotate(180deg)"></iconify-icon></span>
+                            <span class="nav-text">سندات الصرف (الموردين)</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('subscriber.app.supplier-balances') }}">
+                            <span class="nav-icon"><iconify-icon icon="solar:shop-2-bold"></iconify-icon></span>
+                            <span class="nav-text">أرصدة الموردين</span>
+                        </a>
+                    </li>
+
                     <li class="nav-item-title">العمليات</li>
 
                     <li class="nav-item">
