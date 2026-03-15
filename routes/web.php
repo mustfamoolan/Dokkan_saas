@@ -79,8 +79,17 @@ Route::name('subscriber.')->group(function () {
         // Debts & Statements
         Route::get('customers/{customer}/statement', [App\Http\Controllers\Subscriber\App\StatementController::class, 'customerStatement'])->name('customers.statement');
         Route::get('suppliers/{supplier}/statement', [App\Http\Controllers\Subscriber\App\StatementController::class, 'supplierStatement'])->name('suppliers.statement');
-        Route::get('customer-balances', [App\Http\Controllers\Subscriber\App\StatementController::class, 'customerBalances'])->name('customer-balances');
-        Route::get('supplier-balances', [App\Http\Controllers\Subscriber\App\StatementController::class, 'supplierBalances'])->name('supplier-balances');
+        // Reports
+        Route::prefix('reports')->name('reports.')->group(function () {
+            Route::get('/', [App\Http\Controllers\Subscriber\App\ReportController::class, 'index'])->name('index');
+            Route::get('/sales', [App\Http\Controllers\Subscriber\App\ReportController::class, 'sales'])->name('sales');
+            Route::get('/purchases', [App\Http\Controllers\Subscriber\App\ReportController::class, 'purchases'])->name('purchases');
+            Route::get('/inventory', [App\Http\Controllers\Subscriber\App\ReportController::class, 'inventory'])->name('inventory');
+            Route::get('/customers', [App\Http\Controllers\Subscriber\App\ReportController::class, 'customers'])->name('customers');
+            Route::get('/suppliers', [App\Http\Controllers\Subscriber\App\ReportController::class, 'suppliers'])->name('suppliers');
+            Route::get('/cashboxes', [App\Http\Controllers\Subscriber\App\ReportController::class, 'cashboxes'])->name('cashboxes');
+            Route::get('/expenses', [App\Http\Controllers\Subscriber\App\ReportController::class, 'expenses'])->name('expenses');
+        });
     });
 });
 

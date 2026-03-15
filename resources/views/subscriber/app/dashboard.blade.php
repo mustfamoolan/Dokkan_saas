@@ -4,19 +4,6 @@
 
 @section('content')
 <div class="row">
-    <div class="col-12">
-        <div class="card bg-primary-subtle border-0 mb-4">
-            <div class="card-body p-4">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                        <h3 class="mb-1 text-primary">مرحباً بك، {{ $subscriber->name }}!</h3>
-                        <p class="text-muted mb-0">أنت تشاهد ملخص متجر <strong>{{ $store->name }}</strong></p>
-                    </div>
-                    <div class="text-end">
-                        <span class="badge bg-primary fs-13 px-3 py-2">باقة {{ $subscription->plan->name }}</span>
-                        @if($subscription->is_trial)
-                            <div class="mt-2 text-warning fw-bold small">فترة تجريبية</div>
-                        @endif
                     </div>
                 </div>
             </div>

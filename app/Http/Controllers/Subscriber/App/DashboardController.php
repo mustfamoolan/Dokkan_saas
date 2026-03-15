@@ -3,37 +3,24 @@
 namespace App\Http\Controllers\Subscriber\App;
 
 use App\Http\Controllers\Controller;
-use App\Models\Subscription;
-use App\Services\PlanUsageService;
+use App\Models\UsageCounter;
+use App\Services\ReportService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
-    protected $usageService;
+    protected $reportService;
 
-    public function __construct(PlanUsageService $usageService)
+    public function __construct(ReportService $reportService)
     {
-        $this->usageService = $usageService;
+        $this->reportService = $reportService;
     }
 
     public function index()
     {
-        $subscriber = Auth::guard('subscriber')->user();
-        $store = $subscriber->store;
-        $subscription = Subscription::where('store_id', $store->id)
-            ->whereIn('status', ['active', 'trial'])
-            ->with('plan.features')
-            ->latest()
-            ->first();
-
-        $metrics = [
-            'products' => $this->usageService->getDetailedStatus($store, 'max_products'),
-            'customers' => $this->usageService->getDetailedStatus($store, 'max_customers'),
-            'invoices' => $this->usageService->getDetailedStatus($store, 'max_invoices_per_month'),
-            'users' => $this->usageService->getDetailedStatus($store, 'max_users'),
-        ];
-
-        return view('subscriber.app.dashboard', compact('subscriber', 'store', 'subscription', 'metrics'));
+        $metrics = $this->reportService->getSummaryMetrics();
+        $counters = UsageCounter::all()->pluck('current_value', 'counter_key');
+        
+        return view('subscriber.app.dashboard', compact('counters', 'metrics'));
     }
 }

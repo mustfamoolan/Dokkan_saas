@@ -103,6 +103,13 @@
                         </a>
                     </li>
 
+                    <li class="nav-item">
+                        <a class="nav-link text-primary fw-bold" href="{{ route('subscriber.app.reports.index') }}">
+                            <span class="nav-icon"><iconify-icon icon="solar:chart-2-bold-duotone"></iconify-icon></span>
+                            <span class="nav-text">مركز التقارير</span>
+                        </a>
+                    </li>
+
                     <li class="nav-item-title">العمليات</li>
 
                     <li class="nav-item">
