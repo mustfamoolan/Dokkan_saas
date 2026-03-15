@@ -16,10 +16,6 @@ use Illuminate\Support\Facades\Storage;
 
 class OnboardingController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth:subscriber');
-    }
 
     public function status()
     {
@@ -29,6 +25,8 @@ class OnboardingController extends Controller
         if (!$store) {
             return redirect()->route('subscriber.onboarding.store-setup');
         }
+
+        $subscription = $subscriber->store->subscriptions()->latest()->first();
 
         if (!$subscription) {
             return redirect()->route('subscriber.onboarding.plan-selection');

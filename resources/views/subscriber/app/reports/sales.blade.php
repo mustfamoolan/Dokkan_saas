@@ -5,9 +5,12 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="mb-0">تقرير المبيعات</h4>
-    <form action="{{ route('subscriber.app.reports.sales') }}" method="GET" class="d-flex gap-2 align-items-center">
-        <select name="filter" class="form-select form-select-sm" onchange="this.form.submit()">
-            <option value="today" {{ $range['filter'] == 'today' ? 'selected' : '' }}>اليوم</option>
+    <div class="d-flex gap-2 align-items-center">
+        <a href="{{ route('subscriber.app.reports.sales.export', request()->all()) }}" class="btn btn-sm btn-soft-primary">
+            <iconify-icon icon="solar:download-bold" class="me-1"></iconify-icon> تصدير CSV
+        </a>
+        <form action="{{ route('subscriber.app.reports.sales') }}" method="GET" class="d-flex gap-2 align-items-center">
+            <select name="filter" class="form-select form-select-sm" onchange="this.form.submit()">
             <option value="week" {{ $range['filter'] == 'week' ? 'selected' : '' }}>هذا الأسبوع</option>
             <option value="month" {{ $range['filter'] == 'month' ? 'selected' : '' }}>هذا الشهر</option>
             <option value="year" {{ $range['filter'] == 'year' ? 'selected' : '' }}>هذه السنة</option>

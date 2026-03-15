@@ -8,7 +8,12 @@
         <div class="card border-0 shadow-sm overflow-hidden">
             <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">سند قبض رقم: <span class="text-primary">{{ $customerPayment->payment_number }}</span></h5>
-                <a href="{{ route('subscriber.app.customer-payments.index') }}" class="btn btn-sm btn-light">العودة للقائمة</a>
+                <div class="d-flex gap-2">
+        <a href="{{ route('subscriber.app.print.customer-payment', $customerPayment) }}" target="_blank" class="btn btn-soft-secondary">
+            <iconify-icon icon="solar:printer-bold" class="me-1"></iconify-icon> طباعة السند
+        </a>
+        <a href="{{ route('subscriber.app.customer-payments.index') }}" class="btn btn-light">العودة للقائمة</a>
+    </div>
             </div>
             <div class="card-body">
                 <div class="row g-4 mb-5 text-center">

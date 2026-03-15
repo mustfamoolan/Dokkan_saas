@@ -141,9 +141,30 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
+                        <a class="nav-link {{ request()->routeIs('subscriber.app.representatives.*') ? 'active' : '' }}" href="{{ route('subscriber.app.representatives.index') }}">
+                            <span class="nav-icon"><iconify-icon icon="solar:users-group-rounded-bold-duotone"></iconify-icon></span>
+                            <span class="nav-text">المناديب</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('subscriber.app.orders.*') ? 'active' : '' }}" href="{{ route('subscriber.app.orders.index') }}">
+                            <span class="nav-icon"><iconify-icon icon="solar:delivery-bold-duotone"></iconify-icon></span>
+                            <span class="nav-text">طلبات التوصيل</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('subscriber.app.notifications.*') ? 'active' : '' }}" href="{{ route('subscriber.app.notifications.index') }}">
+                            <span class="nav-icon"><iconify-icon icon="solar:bell-bing-bold-duotone"></iconify-icon></span>
+                            <span class="nav-text">التنبيهات</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('subscriber.app.settings.*') ? 'active' : '' }}" href="{{ route('subscriber.app.settings.store') }}">
                             <span class="nav-icon"><iconify-icon icon="solar:settings-bold"></iconify-icon></span>
-                            <span class="nav-text">الإعدادات (قريباً)</span>
+                            <span class="nav-text">إعدادات المتجر</span>
                         </a>
                     </li>
                 </ul>
@@ -151,6 +172,11 @@
         </div>
 
         <!-- Topbar -->
+        @inject('notificationService', 'App\Services\NotificationService')
+        @php
+            $unreadCount = $notificationService->getUnreadCount(Auth::guard('subscriber')->user()->store->id);
+            $latestNotifications = $notificationService->getLatest(Auth::guard('subscriber')->user()->store->id);
+        @endphp
         <header class="topbar">
             <div class="container-fluid">
                 <div class="navbar-header">
@@ -162,6 +188,62 @@
                     </div>
 
                     <div class="d-flex align-items-center gap-2">
+                        <!-- Notifications -->
+                        <div class="dropdown">
+                            <button class="nav-link dropdown-toggle arrow-none" data-bs-toggle="dropdown" type="button">
+                                <iconify-icon icon="solar:bell-bing-bold" class="fs-22"></iconify-icon>
+                                @if($unreadCount > 0)
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                        {{ $unreadCount > 9 ? '9+' : $unreadCount }}
+                                    </span>
+                                @endif
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end dropdown-menu-animated dropdown-lg py-0 overflow-hidden">
+                                <div class="p-2 border-bottom bg-light">
+                                    <div class="row align-items-center">
+                                        <div class="col">
+                                            <h6 class="m-0">التنبيهات</h6>
+                                        </div>
+                                        <div class="col-auto">
+                                            <a href="{{ route('subscriber.app.notifications.index') }}" class="text-dark"><small>عرض الكل</small></a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="scrollbar" style="max-height: 300px;" data-simplebar>
+                                    @forelse($latestNotifications as $notif)
+                                        <a href="{{ route('subscriber.app.notifications.mark-read', $notif->id) }}" class="dropdown-item p-3 border-bottom {{ $notif->is_read ? 'opacity-75' : 'bg-light-subtle' }}">
+                                            <div class="d-flex align-items-start gap-2">
+                                                <div class="flex-shrink-0">
+                                                    @php
+                                                        $notifIcon = 'solar:info-circle-bold';
+                                                        $notifColor = 'text-info';
+                                                        if($notif->severity === 'warning') { $notifIcon = 'solar:danger-triangle-bold'; $notifColor = 'text-warning'; }
+                                                        if($notif->severity === 'danger') { $notifIcon = 'solar:danger-circle-bold'; $notifColor = 'text-danger'; }
+                                                        if($notif->severity === 'success') { $notifIcon = 'solar:check-circle-bold'; $notifColor = 'text-success'; }
+                                                    @endphp
+                                                    <iconify-icon icon="{{ $notifIcon }}" class="fs-20 {{ $notifColor }}"></iconify-icon>
+                                                </div>
+                                                <div class="flex-grow-1 overflow-hidden">
+                                                    <h6 class="mb-1 fw-bold fs-14">{{ $notif->title }}</h6>
+                                                    <p class="text-muted small mb-0 text-truncate">{{ $notif->message }}</p>
+                                                    <small class="text-muted">{{ $notif->created_at->diffForHumans() }}</small>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    @empty
+                                        <div class="text-center p-4">
+                                            <p class="text-muted mb-0">لا توجد تنبيهات جديدة</p>
+                                        </div>
+                                    @endforelse
+                                </div>
+
+                                <a href="{{ route('subscriber.app.notifications.index') }}" class="dropdown-item text-center text-primary fw-bold py-2 border-top">
+                                    عرض جميع التنبيهات
+                                </a>
+                            </div>
+                        </div>
+
                         <div class="dropdown">
                             <button class="nav-link dropdown-toggle" type="button" data-bs-toggle="dropdown">
                                 <span class="d-none d-md-block">{{ Auth::guard('subscriber')->user()->name }}</span>

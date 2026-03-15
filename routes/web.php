@@ -7,6 +7,11 @@ Route::get('/', function () {
     return redirect()->route('subscriber.login');
 });
 
+// Alias for generic login route to prevent "Route [login] not defined" from default middleware
+Route::get('/login-redirect', function () {
+    return redirect()->route('subscriber.login');
+})->name('login');
+
 // Subscriber Public Routes
 Route::name('subscriber.')->group(function () {
     Route::middleware('guest:subscriber')->group(function () {
@@ -77,6 +82,8 @@ Route::name('subscriber.')->group(function () {
         Route::resource('supplier-payments', App\Http\Controllers\Subscriber\App\SupplierPaymentController::class)->except(['edit', 'update', 'destroy']);
 
         // Debts & Statements
+        Route::get('customer-balances', [App\Http\Controllers\Subscriber\App\StatementController::class, 'customerBalances'])->name('customer-balances');
+        Route::get('supplier-balances', [App\Http\Controllers\Subscriber\App\StatementController::class, 'supplierBalances'])->name('supplier-balances');
         Route::get('customers/{customer}/statement', [App\Http\Controllers\Subscriber\App\StatementController::class, 'customerStatement'])->name('customers.statement');
         Route::get('suppliers/{supplier}/statement', [App\Http\Controllers\Subscriber\App\StatementController::class, 'supplierStatement'])->name('suppliers.statement');
         // Reports
@@ -89,7 +96,43 @@ Route::name('subscriber.')->group(function () {
             Route::get('/suppliers', [App\Http\Controllers\Subscriber\App\ReportController::class, 'suppliers'])->name('suppliers');
             Route::get('/cashboxes', [App\Http\Controllers\Subscriber\App\ReportController::class, 'cashboxes'])->name('cashboxes');
             Route::get('/expenses', [App\Http\Controllers\Subscriber\App\ReportController::class, 'expenses'])->name('expenses');
+            
+            // Export Routes
+            Route::get('/sales/export', [App\Http\Controllers\Subscriber\App\ReportController::class, 'exportSales'])->name('sales.export');
+            Route::get('/purchases/export', [App\Http\Controllers\Subscriber\App\ReportController::class, 'exportPurchases'])->name('purchases.export');
+            Route::get('/inventory/export', [App\Http\Controllers\Subscriber\App\ReportController::class, 'exportInventory'])->name('inventory.export');
         });
+// Print Routes
+        Route::prefix('print')->name('print.')->group(function () {
+            Route::get('/sales/{invoice}', [App\Http\Controllers\Subscriber\App\PrintController::class, 'salesInvoice'])->name('sales-invoice');
+            Route::get('/purchases/{invoice}', [App\Http\Controllers\Subscriber\App\PrintController::class, 'purchaseInvoice'])->name('purchase-invoice');
+            Route::get('/customer-payments/{payment}', [App\Http\Controllers\Subscriber\App\PrintController::class, 'customerPayment'])->name('customer-payment');
+            Route::get('/supplier-payments/{payment}', [App\Http\Controllers\Subscriber\App\PrintController::class, 'supplierPayment'])->name('supplier-payment');
+            Route::get('/customers/{customer}/statement', [App\Http\Controllers\Subscriber\App\PrintController::class, 'customerStatement'])->name('customer-statement');
+            Route::get('/suppliers/{supplier}/statement', [App\Http\Controllers\Subscriber\App\PrintController::class, 'supplierStatement'])->name('supplier-statement');
+        });
+
+        // Store Settings
+        Route::prefix('settings')->name('settings.')->group(function () {
+            Route::get('/store', [App\Http\Controllers\Subscriber\App\StoreSettingsController::class, 'index'])->name('store');
+            Route::post('/store/branding', [App\Http\Controllers\Subscriber\App\StoreSettingsController::class, 'updateBranding'])->name('store.branding');
+            Route::post('/store/operational', [App\Http\Controllers\Subscriber\App\StoreSettingsController::class, 'updateOperational'])->name('store.operational');
+            Route::post('/store/numbering', [App\Http\Controllers\Subscriber\App\StoreSettingsController::class, 'updateNumbering'])->name('store.numbering');
+            Route::post('/store/printing', [App\Http\Controllers\Subscriber\App\StoreSettingsController::class, 'updatePrinting'])->name('store.printing');
+        });
+
+        // Notifications
+        Route::get('/notifications', [App\Http\Controllers\Subscriber\App\NotificationController::class, 'index'])->name('notifications.index');
+        Route::match(['get', 'post'], '/notifications/{id}/read', [App\Http\Controllers\Subscriber\App\NotificationController::class, 'markRead'])->name('notifications.mark-read');
+        Route::match(['get', 'post'], '/notifications/read-all', [App\Http\Controllers\Subscriber\App\NotificationController::class, 'markAllRead'])->name('notifications.mark-all-read');
+
+        // Representatives
+        Route::resource('representatives', App\Http\Controllers\Subscriber\App\RepresentativeController::class);
+
+        // Delivery Orders
+        Route::post('orders/{order}/status', [App\Http\Controllers\Subscriber\App\DeliveryOrderController::class, 'updateStatus'])->name('orders.update-status');
+        Route::post('orders/{order}/assign', [App\Http\Controllers\Subscriber\App\DeliveryOrderController::class, 'assign'])->name('orders.assign');
+        Route::resource('orders', App\Http\Controllers\Subscriber\App\DeliveryOrderController::class);
     });
 });
 

@@ -46,12 +46,20 @@ class PurchaseService
      */
     public function generateInvoiceNumber($storeId)
     {
+        $store = \App\Models\Store::find($storeId);
+        $prefix = ($store && $store->config) ? $store->config->purchase_prefix : 'PUR-';
+
         $lastInvoice = PurchaseInvoice::where('store_id', $storeId)
+            ->where('invoice_number', 'like', $prefix . '%')
             ->latest()
             ->first();
 
-        $number = $lastInvoice ? (int) str_replace('PUR-', '', $lastInvoice->invoice_number) + 1 : 1;
+        if ($lastInvoice) {
+            $number = (int) str_replace($prefix, '', $lastInvoice->invoice_number) + 1;
+        } else {
+            $number = 1;
+        }
 
-        return 'PUR-' . str_pad($number, 5, '0', STR_PAD_LEFT);
+        return $prefix . str_pad($number, 5, '0', STR_PAD_LEFT);
     }
 }

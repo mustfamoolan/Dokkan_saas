@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Subscriber\App;
 use App\Http\Controllers\Controller;
 use App\Services\ReportService;
 use App\Services\StatementService;
+use App\Services\ExportService;
 use App\Models\Customer;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
@@ -14,11 +15,13 @@ class ReportController extends Controller
 {
     protected $reportService;
     protected $statementService;
+    protected $exportService;
 
-    public function __construct(ReportService $reportService, StatementService $statementService)
+    public function __construct(ReportService $reportService, StatementService $statementService, ExportService $exportService)
     {
         $this->reportService = $reportService;
         $this->statementService = $statementService;
+        $this->exportService = $exportService;
     }
 
     /**
@@ -88,6 +91,44 @@ class ReportController extends Controller
         $range = $this->getDateRange($request);
         $data = $this->reportService->getExpenseReport($range['start'], $range['end']);
         return view('subscriber.app.reports.expenses', compact('data', 'range'));
+    }
+
+    public function exportSales(Request $request)
+    {
+        $range = $this->getDateRange($request);
+        $data = $this->reportService->getSalesReport($range['start'], $range['end']);
+        
+        $csvData = [['رقم الفاتورة', 'التاريخ', 'العميل', 'القيمة']];
+        foreach ($data['invoices'] as $invoice) {
+            $csvData[] = [$invoice->invoice_number, $invoice->invoice_date->format('Y-m-d'), $invoice->customer->name, $invoice->total_amount];
+        }
+
+        return $this->exportService->toCsv($csvData, 'sales_report_' . now()->format('Ymd'));
+    }
+
+    public function exportPurchases(Request $request)
+    {
+        $range = $this->getDateRange($request);
+        $data = $this->reportService->getPurchaseReport($range['start'], $range['end']);
+        
+        $csvData = [['رقم الفاتورة', 'التاريخ', 'المورد', 'القيمة']];
+        foreach ($data['invoices'] as $invoice) {
+            $csvData[] = [$invoice->invoice_number, $invoice->invoice_date->format('Y-m-d'), $invoice->supplier->name, $invoice->total_amount];
+        }
+
+        return $this->exportService->toCsv($csvData, 'purchase_report_' . now()->format('Ymd'));
+    }
+
+    public function exportInventory()
+    {
+        $data = $this->reportService->getInventoryReport();
+        
+        $csvData = [['المنتج', 'المستودع', 'الباركود', 'الكمية']];
+        foreach ($data['all_stocks'] as $stock) {
+            $csvData[] = [$stock->product->name, $stock->warehouse->name, $stock->product->barcode, $stock->quantity];
+        }
+
+        return $this->exportService->toCsv($csvData, 'inventory_report_' . now()->format('Ymd'));
     }
 
     /**

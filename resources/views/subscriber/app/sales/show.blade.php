@@ -9,6 +9,9 @@
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h4 class="card-title">بيانات الفاتورة: {{ $sale->invoice_number }}</h4>
                 <div class="d-flex gap-2">
+                    <a href="{{ route('subscriber.app.print.sales-invoice', $sale) }}" target="_blank" class="btn btn-soft-secondary btn-sm">
+                        <iconify-icon icon="solar:printer-bold" class="me-1"></iconify-icon> طباعة
+                    </a>
                     @if($sale->status == 'draft')
                         <a href="{{ route('subscriber.app.sales.edit', $sale) }}" class="btn btn-soft-primary btn-sm">تعديل</a>
                         <form action="{{ route('subscriber.app.sales.post', $sale) }}" method="POST">

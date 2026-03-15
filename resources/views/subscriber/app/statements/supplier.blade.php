@@ -6,10 +6,12 @@
 <div class="d-flex justify-content-between align-items-center mb-4 d-print-none">
     <h4 class="mb-0">كشف حساب مورد</h4>
     <div>
-        <button onclick="window.print()" class="btn btn-soft-secondary">
+        <a href="{{ route('subscriber.app.print.supplier-statement', $supplier) }}" target="_blank" class="btn btn-soft-secondary me-2">
             <iconify-icon icon="solar:printer-bold" class="me-1"></iconify-icon> طباعة الكشف
-        </button>
-        <a href="{{ route('subscriber.app.suppliers.show', $supplier) }}" class="btn btn-light ms-2">العودة للمورد</a>
+        </a>
+        <a href="{{ route('subscriber.app.suppliers.index') }}" class="btn btn-light">
+            <iconify-icon icon="solar:arrow-right-linear" class="me-1"></iconify-icon> عودة للموردين
+        </a>
     </div>
 </div>
 

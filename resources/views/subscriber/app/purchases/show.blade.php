@@ -11,11 +11,20 @@
                 <div class="d-flex gap-2">
                     @if($purchase->status == 'draft')
                         <a href="{{ route('subscriber.app.purchases.edit', $purchase) }}" class="btn btn-soft-primary btn-sm">تعديل</a>
-                        <form action="{{ route('subscriber.app.purchases.post', $purchase) }}" method="POST">
-                            @csrf
-                            <button type="submit" class="btn btn-success btn-sm">اعتماد الفاتورة</button>
-                        </form>
                     @endif
+                    <div class="d-flex align-items-center gap-2">
+                        <a href="{{ route('subscriber.app.print.purchase-invoice', $purchase) }}" target="_blank" class="btn btn-soft-secondary">
+                            <iconify-icon icon="solar:printer-bold" class="me-1"></iconify-icon> طباعة
+                        </a>
+                        @if($purchase->status == 'draft')
+                            <form action="{{ route('subscriber.app.purchases.post', $purchase) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="btn btn-success">
+                                    <iconify-icon icon="solar:check-read-bold" class="me-1"></iconify-icon> اعتماد الفاتورة
+                                </button>
+                            </form>
+                        @endif
+                    </div>
                 </div>
             </div>
             <div class="card-body">

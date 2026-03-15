@@ -116,12 +116,6 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($subscriber->payments as $payment)
-                                <!-- This is actually subscriber->subscriptions in the model? Let me check -->
-                                {{-- I need to make sure I load subscriptions --}}
-                            @endforelse
-
-                            {{-- Re-checking model relationships... Subscriber has payments? Wait --}}
                             @php
                                 $subscriptions = \App\Models\Subscription::where('subscriber_id', $subscriber->id)->with('plan')->latest()->get();
                             @endphp

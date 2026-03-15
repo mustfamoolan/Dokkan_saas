@@ -37,4 +37,19 @@ class Store extends Model
     {
         return $this->hasMany(UsageLimitOverride::class);
     }
+
+    public function config()
+    {
+        return $this->hasOne(StoreConfig::class);
+    }
+
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
+    public function subscription()
+    {
+        return $this->hasOne(Subscription::class)->latestOfMany();
+    }
 }

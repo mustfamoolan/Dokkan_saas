@@ -5,7 +5,11 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="mb-0">تقرير المخزون والمستودعات</h4>
-    <form action="{{ route('subscriber.app.reports.inventory') }}" method="GET" class="d-flex gap-2 align-items-center">
+    <div class="d-flex gap-2 align-items-center">
+        <a href="{{ route('subscriber.app.reports.inventory.export') }}" class="btn btn-sm btn-soft-primary">
+            <iconify-icon icon="solar:download-bold" class="me-1"></iconify-icon> تصدير CSV
+        </a>
+        <form action="{{ route('subscriber.app.reports.inventory') }}" method="GET" class="d-flex gap-2 align-items-center">
         <select name="warehouse_id" class="form-select form-select-sm" onchange="this.form.submit()">
             <option value="">جميع المستودعات</option>
             @foreach($data['warehouses'] as $wh)

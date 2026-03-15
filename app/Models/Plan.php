@@ -36,4 +36,23 @@ class Plan extends Model
     {
         return $this->hasMany(PlanFeature::class);
     }
+
+    public function getFeatureValue($key, $default = null)
+    {
+        $feature = $this->features()->where('feature_key', $key)->first();
+        
+        if (!$feature) {
+            return $default;
+        }
+
+        if ($feature->value_type === 'boolean') {
+            return filter_var($feature->feature_value, FILTER_VALIDATE_BOOLEAN);
+        }
+
+        if ($feature->value_type === 'limit' || is_numeric($feature->feature_value)) {
+            return (int) $feature->feature_value;
+        }
+
+        return $feature->feature_value;
+    }
 }
