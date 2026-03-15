@@ -38,6 +38,42 @@
                </li>
 
                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.subscribers*') ? 'active' : '' }}" href="{{ route('admin.subscribers') }}">
+                         <span class="nav-icon">
+                              <iconify-icon icon="solar:users-group-rounded-broken"></iconify-icon>
+                         </span>
+                         <span class="nav-text"> المشتركين </span>
+                    </a>
+               </li>
+
+               <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.subscriptions*') ? 'active' : '' }}" href="{{ route('admin.subscriptions') }}">
+                         <span class="nav-icon">
+                              <iconify-icon icon="solar:card-2-broken"></iconify-icon>
+                         </span>
+                         <span class="nav-text"> الاشتراكات </span>
+                    </a>
+               </li>
+
+               <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.payments*') ? 'active' : '' }}" href="{{ route('admin.payments') }}">
+                         <span class="nav-icon">
+                              <iconify-icon icon="solar:dollar-minimalistic-broken"></iconify-icon>
+                         </span>
+                         <span class="nav-text"> المدفوعات </span>
+                    </a>
+               </li>
+
+               <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.plans*') ? 'active' : '' }}" href="{{ route('admin.plans') }}">
+                         <span class="nav-icon">
+                              <iconify-icon icon="solar:box-broken"></iconify-icon>
+                         </span>
+                         <span class="nav-text"> الباقات </span>
+                    </a>
+               </li>
+
+               <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('admin.settings') ? 'active' : '' }}" href="{{ route('admin.settings') }}">
                          <span class="nav-icon">
                               <iconify-icon icon="solar:settings-broken"></iconify-icon>

@@ -20,6 +20,8 @@ class AdminMiddleware
             return redirect()->route('admin.login');
         }
 
+        Auth::shouldUse('admin');
+
         // Check if admin is active
         if (Auth::guard('admin')->user()->status !== 'active') {
             Auth::guard('admin')->logout();

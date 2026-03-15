@@ -7,19 +7,29 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h4 class="card-title mb-0">قائمة المشرفين</h4>
-                <button class="btn btn-sm btn-primary">إضافة مشرف</button>
+                <h4 class="card-title">قائمة المشرفين</h4>
+                @can('create admins')
+                    <a href="{{ route('admin.admins.create') }}" class="btn btn-primary btn-sm">إضافة مشرف جديد</a>
+                @endcan
             </div>
-            <div class="card-body p-0">
+            <div class="card-body">
+                @if(session('success'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
                 <div class="table-responsive">
                     <table class="table table-centered table-nowrap mb-0">
-                        <thead class="bg-light">
+                        <thead class="table-light">
                             <tr>
                                 <th>الاسم</th>
                                 <th>البريد الإلكتروني</th>
+                                <th>الدور</th>
                                 <th>الحالة</th>
-                                <th>الأدوار</th>
-                                <th>العمليات</th>
+                                <th>تاريخ الإنضمام</th>
+                                <th>الإجراءات</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -28,13 +38,8 @@
                                 <td>{{ $admin->name }}</td>
                                 <td>{{ $admin->email }}</td>
                                 <td>
-                                    <span class="badge {{ $admin->status === 'active' ? 'bg-success' : 'bg-danger' }}">
-                                        {{ $admin->status === 'active' ? 'نشط' : 'غير نشط' }}
-                                    </span>
-                                </td>
-                                <td>
-                                    @foreach($admin->getRoleNames() as $role)
-                                        <span class="badge bg-secondary">{{ $role }}</span>
+                                    @foreach($admin->roles as $role)
+                                        <span class="badge bg-info-subtle text-info">{{ $role->name }}</span>
                                     @endforeach
                                 </td>
                                 <td>
