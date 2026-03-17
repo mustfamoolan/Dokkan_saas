@@ -29,10 +29,21 @@
                             @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">كلمة المرور (اختياري)</label>
-                            <input type="password" name="password" class="form-control @error('password') is-invalid @enderror">
-                            <small class="text-muted">للدخول للتطبيق لاحقاً</small>
+                            <label class="form-label">كلمة المرور <span class="text-danger">*</span></label>
+                            <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" required>
                             @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">تأكيد كلمة المرور <span class="text-danger">*</span></label>
+                            <input type="password" name="password_confirmation" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">حالة المندوب</label>
+                            <select name="is_active" class="form-select @error('is_active') is-invalid @enderror">
+                                <option value="1" {{ old('is_active', '1') == '1' ? 'selected' : '' }}>نشط</option>
+                                <option value="0" {{ old('is_active') == '0' ? 'selected' : '' }}>معطل</option>
+                            </select>
+                            @error('is_active') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
                         <hr class="my-3 text-muted">
                         <div class="col-md-6 mb-3">

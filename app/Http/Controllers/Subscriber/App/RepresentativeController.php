@@ -46,16 +46,20 @@ class RepresentativeController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
+            'phone' => 'required|string|max:20|unique:representatives,phone',
             'email' => 'nullable|email|max:255',
             'commission_type' => 'nullable|in:fixed,percentage',
             'commission_value' => 'nullable|numeric|min:0',
-            'password' => 'nullable|string|min:6',
+            'password' => 'required|string|min:6|confirmed',
+            'is_active' => 'boolean',
             'notes' => 'nullable|string',
         ]);
 
-        if (!empty($validated['password'])) {
-            $validated['password'] = Hash::make($validated['password']);
+        $validated['password'] = Hash::make($validated['password']);
+        $validated['store_id'] = $store->id; // Enforce store_id from server
+
+        if (!isset($validated['is_active'])) {
+             $validated['is_active'] = false;
         }
 
         Representative::create($validated);
@@ -80,12 +84,12 @@ class RepresentativeController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
+            'phone' => 'required|string|max:20|unique:representatives,phone,' . $representative->id,
             'email' => 'nullable|email|max:255',
             'commission_type' => 'nullable|in:fixed,percentage',
             'commission_value' => 'nullable|numeric|min:0',
             'is_active' => 'required|boolean',
-            'password' => 'nullable|string|min:6',
+            'password' => 'nullable|string|min:6|confirmed',
             'notes' => 'nullable|string',
         ]);
 

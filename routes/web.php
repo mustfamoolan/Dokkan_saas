@@ -192,3 +192,27 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/settings', [App\Http\Controllers\Admin\SettingController::class, 'update'])->can('manage settings');
     });
 });
+
+// Representative Auth and App Routes
+Route::prefix('rep')->name('rep.')->group(function () {
+    Route::middleware('guest:representative')->group(function () {
+        Route::get('/login', [App\Http\Controllers\Representative\Auth\LoginController::class, 'showLoginForm'])->name('login');
+        Route::post('/login', [App\Http\Controllers\Representative\Auth\LoginController::class, 'login']);
+    });
+
+    Route::post('/logout', [App\Http\Controllers\Representative\Auth\LoginController::class, 'logout'])->name('logout');
+
+    Route::middleware('auth:representative')->group(function () {
+        Route::get('/dashboard', [App\Http\Controllers\Representative\DashboardController::class, 'index'])->name('dashboard');
+        
+        Route::get('/orders', [App\Http\Controllers\Representative\OrderController::class, 'index'])->name('orders.index');
+        
+        Route::get('/customers', [App\Http\Controllers\Representative\CustomerController::class, 'index'])->name('customers.index');
+        
+        Route::get('/profile', [App\Http\Controllers\Representative\ProfileController::class, 'index'])->name('profile.index');
+        Route::put('/profile/password', [App\Http\Controllers\Representative\ProfileController::class, 'updatePassword'])->name('profile.password');
+        
+        Route::get('/financials', [App\Http\Controllers\Representative\FinancialController::class, 'index'])->name('financials.index');
+    });
+});
+

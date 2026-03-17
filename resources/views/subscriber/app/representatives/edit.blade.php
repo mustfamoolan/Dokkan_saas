@@ -36,6 +36,10 @@
                             @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
                         <div class="col-md-6 mb-3">
+                            <label class="form-label">تأكيد كلمة المرور</label>
+                            <input type="password" name="password_confirmation" class="form-control">
+                        </div>
+                        <div class="col-md-6 mb-3">
                             <label class="form-label">حالة المندوب</label>
                             <select name="is_active" class="form-select">
                                 <option value="1" {{ $representative->is_active ? 'selected' : '' }}>نشط</option>

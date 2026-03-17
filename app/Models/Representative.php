@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use App\Traits\HasStoreScope;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User;
+use Illuminate\Notifications\Notifiable;
 
-class Representative extends Model
+class Representative extends User
 {
-    use HasStoreScope;
+    use HasStoreScope, Notifiable;
 
     protected $fillable = [
         'store_id',
@@ -21,10 +22,19 @@ class Representative extends Model
         'notes',
     ];
 
-    protected $casts = [
-        'is_active' => 'boolean',
-        'commission_value' => 'decimal:2',
+    protected $hidden = [
+        'password',
+        'remember_token',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'is_active' => 'boolean',
+            'commission_value' => 'decimal:2',
+            'password' => 'hashed',
+        ];
+    }
 
     public function store()
     {
