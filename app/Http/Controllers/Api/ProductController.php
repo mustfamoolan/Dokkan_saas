@@ -25,28 +25,27 @@ class ProductController extends Controller
             'supplier_id' => 'nullable|exists:suppliers,id',
             'units_per_carton' => 'integer',
             'weight_per_carton' => 'nullable|numeric',
-            'pricing.cost' => 'required|numeric',
-            'pricing.retail_price' => 'required|numeric',
-            'pricing.wholesale_price' => 'required|numeric',
+            'base_unit' => 'nullable|string',
+            'unit_type' => 'nullable|string',
+            'latest_price.cost' => 'required|numeric',
+            'latest_price.retail_price' => 'required|numeric',
+            'latest_price.wholesale_price' => 'nullable|numeric',
             'stock.cartons' => 'integer',
             'stock.extra_units' => 'integer',
         ]);
 
-        return DB::transaction(function () use ($request, $validated) {
+        return DB::transaction(function () use ($request) {
             $product = Product::create($request->only([
                 'name', 'sku', 'barcode', 'category_id', 'supplier_id', 
-                'units_per_carton', 'weight_per_carton', 'status'
+                'units_per_carton', 'weight_per_carton', 'base_unit', 'unit_type', 'status'
             ]));
 
             // Save Price
-            $product->prices()->create($request->input('pricing'));
+            $product->prices()->create($request->input('latest_price'));
 
             // Save Stock
             $stockData = $request->input('stock', []);
-            $unitsPerCarton = $product->units_per_carton ?: 1;
-            $totalUnits = ( ($stockData['cartons'] ?? 0) * $unitsPerCarton ) + ($stockData['extra_units'] ?? 0);
-            
-            $product->stock()->create(array_merge($stockData, ['total_units' => $totalUnits]));
+            $product->stock()->create($stockData);
 
             return $product->load(['latestPrice', 'stock']);
         });
