@@ -24,6 +24,8 @@ return new class extends Migration
             $table->foreignId('supplier_id')->nullable()->constrained('suppliers')->onDelete('set null');
             $table->integer('units_per_carton')->default(12);
             $table->decimal('weight_per_carton', 10, 2)->nullable();
+            $table->string('base_unit')->nullable(); // e.g. Weight, Volume
+            $table->string('unit_type')->nullable(); // e.g. kg, L
             $table->string('image')->nullable();
             $table->string('status')->default('طبيعي');
             $table->timestamps();
