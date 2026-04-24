@@ -94,4 +94,14 @@ class SupplierController extends Controller
             return response()->json($supplier->load('balances'));
         });
     }
+
+    public function destroy($id)
+    {
+        $supplier = Supplier::find($id);
+        if (!$supplier) {
+            return response()->json(['message' => 'المورد غير موجود'], 404);
+        }
+        $supplier->delete();
+        return response()->json(['message' => 'تم حذف المورد بنجاح']);
+    }
 }

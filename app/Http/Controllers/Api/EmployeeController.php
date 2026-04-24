@@ -108,4 +108,10 @@ class EmployeeController extends Controller
     {
         return $employee->load('balances');
     }
+
+    public function destroy(User $employee)
+    {
+        $employee->delete();
+        return response()->json(['message' => 'تم حذف الموظف بنجاح']);
+    }
 }
