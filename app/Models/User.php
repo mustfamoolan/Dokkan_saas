@@ -5,17 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Spatie\Permission\Traits\HasRoles;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasRoles;
+    use HasApiTokens, HasFactory, Notifiable;
 
     protected $fillable = [
         'name',
-        'email',
         'phone',
         'password',
+        'avatar',
+        'role',
+        'status',
+        'salary_amount',
+        'salary_due_day',
     ];
 
     protected $hidden = [
@@ -26,8 +30,23 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get the user's salaries.
+     */
+    public function salaries()
+    {
+        return $this->hasMany(Salary::class);
+    }
+
+    /**
+     * Get the user's balances (polymorphic).
+     */
+    public function balances()
+    {
+        return $this->morphMany(SmartBalance::class, 'balancable');
     }
 }

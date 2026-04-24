@@ -3,9 +3,9 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Models\SmartBalance;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
@@ -14,18 +14,26 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create Admin User
+        // 1. Create Initial Manager
         $admin = User::firstOrCreate(
             ['phone' => '07742209251'],
             [
-                'name' => 'Dokkan Admin',
-                'email' => 'admin@dokkan.com',
+                'name' => 'المدير العام',
                 'password' => Hash::make('12345678'),
+                'role' => 'manager',
+                'status' => 'active',
+                'salary_amount' => 0,
+                'salary_due_day' => 30,
             ]
         );
 
-        // Create Admin Role if it doesn't exist
-        $role = Role::firstOrCreate(['name' => 'admin']);
-        $admin->assignRole($role);
+        // 2. Initialize Balance for Admin if it doesn't exist
+        if ($admin->balances()->count() === 0) {
+            $admin->balances()->create([
+                'currency' => 'IQD',
+                'balance' => 0,
+                'last_transaction_at' => now(),
+            ]);
+        }
     }
 }
