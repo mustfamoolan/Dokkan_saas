@@ -22,4 +22,21 @@ class CategoryController extends Controller
 
         return Category::create($validated);
     }
+
+    public function update(Request $request, Category $category)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|unique:categories,name,' . $category->id,
+            'icon' => 'nullable|string',
+        ]);
+
+        $category->update($validated);
+        return $category;
+    }
+
+    public function destroy(Category $category)
+    {
+        $category->delete();
+        return response()->json(['message' => 'تم حذف القسم بنجاح']);
+    }
 }
