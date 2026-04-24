@@ -1,40 +1,37 @@
 #!/bin/bash
 
-# Deployment script for Laravel application
-# This script should be run after git pull on the server
+# Deployment script for Dokkan Laravel Application (Docker Environment)
+# This script automates the update process from GitHub to VPS
 
-echo "Starting deployment..."
+echo "🚀 Starting deployment process..."
 
-# Navigate to project directory
-cd "$(dirname "$0")"
+# 1. Update Code from GitHub
+echo "📥 Pulling latest changes from GitHub..."
+git fetch --all
+git reset --hard origin/main
+git clean -fd
 
-# Remove old storage link if it exists (as directory or broken link)
-if [ -d "public/storage" ] && [ ! -L "public/storage" ]; then
-    echo "Removing old public/storage directory..."
-    rm -rf public/storage
-fi
+# 2. Fix Permissions (Host side)
+echo "🔐 Setting folder permissions..."
+chmod -R 777 storage bootstrap/cache
 
-# Remove broken symlink if exists
-if [ -L "public/storage" ] && [ ! -e "public/storage" ]; then
-    echo "Removing broken symlink..."
-    rm -f public/storage
-fi
+# 3. Install Dependencies
+echo "📦 Installing composer dependencies..."
+docker compose exec -T app composer install --no-interaction --prefer-dist --optimize-autoloader
 
-# Create storage link if it doesn't exist
-if [ ! -L "public/storage" ]; then
-    echo "Creating storage symbolic link..."
-    ln -s ../storage/app/public public/storage
-    echo "Storage link created successfully!"
-else
-    echo "Storage link already exists."
-fi
+# 4. Run Database Migrations
+# Note: Using 'migrate' for safety. Use 'migrate:fresh --seed' manually if rebuilding from scratch.
+echo "🗄️ Running database migrations..."
+docker compose exec -T app php artisan migrate --force
 
-# Verify the link
-if [ -L "public/storage" ] && [ -e "public/storage" ]; then
-    echo "✓ Storage link is working correctly"
-else
-    echo "✗ Warning: Storage link may not be working correctly"
-fi
+# 5. Clear Cache and Optimize
+echo "⚡ Clearing cache and optimizing..."
+docker compose exec -T app php artisan optimize:clear
+docker compose exec -T app php artisan config:cache
+docker compose exec -T app php artisan route:cache
 
-echo "Deployment completed!"
+# 6. Handle Storage Link
+echo "🔗 Verifying storage link..."
+docker compose exec -T app php artisan storage:link || echo "Storage link already exists or failed."
 
+echo "✅ Deployment completed successfully!"
