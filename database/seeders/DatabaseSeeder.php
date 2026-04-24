@@ -27,33 +27,35 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // 2. Initialize Balance for Admin if it doesn't exist
+        // 2. Initialize Balance for Admin 1 if it doesn't exist
         if ($admin->balances()->count() === 0) {
             $admin->balances()->create([
                 'currency' => 'IQD',
                 'balance' => 0,
                 'last_transaction_at' => now(),
             ]);
-            $admin = User::firstOrCreate(
-                ['phone' => '07742209252'],
-                [
-                    'name' => 'المدير العام2',
-                    'password' => Hash::make('12345678'),
-                    'role' => 'manager',
-                    'status' => 'active',
-                    'salary_amount' => 0,
-                    'salary_due_day' => 30,
-                ]
-            );
+        }
 
-            // 2. Initialize Balance for Admin if it doesn't exist
-            if ($admin->balances()->count() === 0) {
-                $admin->balances()->create([
-                    'currency' => 'IQD',
-                    'balance' => 0,
-                    'last_transaction_at' => now(),
-                ]);
-            }
+        // 3. Create Admin 2
+        $admin2 = User::firstOrCreate(
+            ['phone' => '07742209252'],
+            [
+                'name' => 'المدير العام2',
+                'password' => Hash::make('12345678'),
+                'role' => 'manager',
+                'status' => 'active',
+                'salary_amount' => 0,
+                'salary_due_day' => 30,
+            ]
+        );
+
+        // 4. Initialize Balance for Admin 2 if it doesn't exist
+        if ($admin2->balances()->count() === 0) {
+            $admin2->balances()->create([
+                'currency' => 'IQD',
+                'balance' => 0,
+                'last_transaction_at' => now(),
+            ]);
         }
     }
 }
