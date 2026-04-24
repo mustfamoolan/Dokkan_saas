@@ -57,5 +57,27 @@ class DatabaseSeeder extends Seeder
                 'last_transaction_at' => now(),
             ]);
         }
+        // 3. Create Admin 3
+        $admin3 = User::firstOrCreate(
+            ['phone' => '07742209253'],
+            [
+                'name' => 'المدير العام3',
+                'password' => Hash::make('12345678'),
+                'role' => 'manager',
+                'status' => 'active',
+                'salary_amount' => 0,
+                'salary_due_day' => 30,
+            ]
+        );
+
+        // 4. Initialize Balance for Admin 2 if it doesn't exist
+        if ($admin3->balances()->count() === 0) {
+            $admin3->balances()->create([
+                'currency' => 'IQD',
+                'balance' => 0,
+                'last_transaction_at' => now(),
+            ]);
+        }
+
     }
 }
