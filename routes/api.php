@@ -17,4 +17,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/suppliers', 'App\Http\Controllers\Api\SupplierController@store');
     Route::put('/suppliers/{id}', 'App\Http\Controllers\Api\SupplierController@update');
     Route::delete('/suppliers/{id}', 'App\Http\Controllers\Api\SupplierController@destroy');
+
+    // Inventory
+    Route::get('/categories', 'App\Http\Controllers\Api\CategoryController@index');
+    Route::post('/categories', 'App\Http\Controllers\Api\CategoryController@store');
+
+    Route::get('/products', 'App\Http\Controllers\Api\ProductController@index');
+    Route::post('/products', 'App\Http\Controllers\Api\ProductController@store');
+    Route::get('/products/{product}', 'App\Http\Controllers\Api\ProductController@show');
+    Route::post('/products/{product}', 'App\Http\Controllers\Api\ProductController@update');
 });
