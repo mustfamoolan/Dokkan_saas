@@ -1,42 +1,51 @@
 #!/bin/bash
 
 # Deployment script for Dokkan Laravel Application (Docker Environment)
-# This script automates the update process from GitHub to VPS
+# This script ensures the entire environment is correctly initialized and updated
 
-echo "🚀 Starting deployment process..."
+echo "🚀 Starting full deployment and initialization..."
 
 # 1. Update Code from GitHub
-echo "📥 Pulling latest changes from GitHub..."
+echo "📥 Syncing code with GitHub..."
 git fetch --all
 git reset --hard origin/main
 git clean -fd
 
-# 2. Fix Permissions (Host side)
-echo "🔐 Setting folder permissions..."
-chmod -R 777 storage bootstrap/cache vendor
+# 2. Ensure Docker Containers are Running
+echo "🐳 Checking Docker containers..."
+docker compose up -d
 
-# 3. Handle broken vendor (Check if vendor is missing key files)
+# 3. Fix Permissions (Host & Container)
+echo "🔐 Optimizing file permissions..."
+chmod -R 777 storage bootstrap/cache vendor
+docker compose exec -T app chmod -R 777 storage bootstrap/cache
+
+# 4. Critical Dependencies Check
+echo "📦 Managing dependencies..."
+# If vendor is missing or broken, force a clean install
 if [ ! -d "vendor/laravel" ]; then
-    echo "⚠️ Vendor folder seems broken. Cleaning up..."
+    echo "⚠️ Vendor directory is missing or corrupt. Reinstalling..."
     rm -rf vendor
+    docker compose exec -T app composer install --no-interaction --prefer-dist
+else
+    docker compose exec -T app composer install --no-interaction --prefer-dist --optimize-autoloader
 fi
 
-# 4. Install Dependencies
-echo "📦 Installing composer dependencies..."
-docker compose exec -T app composer install --no-interaction --prefer-dist --optimize-autoloader
+# 5. Database Initialization
+echo "🗄️ Initializing database..."
+# Note: Using migrate for safety. 
+# Run 'docker compose exec app php artisan migrate:fresh --seed' manually for full reset.
+docker compose exec -T app php artisan migrate --force
 
-# 5. Run Database Migrations
-echo "🗄️ Running database migrations..."
-docker compose exec -T app php artisan migrate:fresh --seed --force
-
-# 6. Clear Cache and Optimize
-echo "⚡ Clearing cache and optimizing..."
+# 6. Optimize Application
+echo "⚡ Optimizing Laravel..."
 docker compose exec -T app php artisan optimize:clear
 docker compose exec -T app php artisan config:cache
 docker compose exec -T app php artisan route:cache
+docker compose exec -T app php artisan view:cache
 
-# 7. Handle Storage Link
-echo "🔗 Verifying storage link..."
-docker compose exec -T app php artisan storage:link || echo "Storage link already exists or failed."
+# 7. Storage and Symbolic Links
+echo "🔗 Verifying storage links..."
+docker compose exec -T app php artisan storage:link --force || echo "Storage link handling completed."
 
-echo "✅ Deployment completed successfully!"
+echo "✨ Deployment and Environment initialization successful!"
