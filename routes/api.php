@@ -28,4 +28,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/products', 'App\Http\Controllers\Api\ProductController@store');
     Route::get('/products/{product}', 'App\Http\Controllers\Api\ProductController@show');
     Route::post('/products/{product}', 'App\Http\Controllers\Api\ProductController@update');
+
+    // Financials
+    Route::get('/financials', 'App\Http\Controllers\Api\FinancialSyncController@index');
+    Route::post('/financials/sync', 'App\Http\Controllers\Api\FinancialSyncController@sync');
 });
