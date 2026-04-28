@@ -32,4 +32,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // Financials
     Route::get('/financials', 'App\Http\Controllers\Api\FinancialSyncController@index');
     Route::post('/financials/sync', 'App\Http\Controllers\Api\FinancialSyncController@sync');
+
+    // Purchase Invoices
+    Route::get('/purchase-invoices', 'App\Http\Controllers\Api\PurchaseInvoiceController@index');
+    Route::post('/purchase-invoices', 'App\Http\Controllers\Api\PurchaseInvoiceController@store');
 });
